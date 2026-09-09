@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description"
+    content="Badminton Court Manager — Scan QR Code lapangan untuk check-in dan check-out sesi badminton secara mandiri." />
+  <meta name="theme-color" content="#16A34A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Badminton Court Manager</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- html5-qrcode CDN -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <style>
+    /* ── User App Styles ─────────────────────────────────────── */
+    :root {
+      --app-max-width: 480px;
+    }
+
+    body {
+      background: linear-gradient(160deg, var(--primary-50) 0%, var(--white) 60%);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Wrapper — centered card on desktop */
+    #app {
+      width: 100%;
+      max-width: var(--app-max-width);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--white);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ── Screen System ──────────────────────────────────────── */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      min-height: 100dvh;
+      padding: var(--space-6) var(--space-4);
+      padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+      opacity: 0;
+      transition: opacity var(--transition-slow);
+    }
+
+    .screen.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .screen.slide-up-enter {
+      animation: slide-up 0.3s ease-out forwards;
+    }
+
+    .screen.fade-enter {
+      animation: fade-in 0.25s ease forwards;
+    }
+
+    /* ── Screen 1: Landing ──────────────────────────────────── */
+    #screen-landing {
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      padding-top: var(--space-16);
+    }
+
+    .landing-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-5);
+      flex: 1;
+    }
+
+    .logo-icon {
+      width: 100px;
+      height: 100px;
+      background: var(--primary-50);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: bounce-gentle 3s ease-in-out infinite;
+      box-shadow: 0 0 0 12px rgba(22, 163, 74, 0.08), 0 0 0 24px rgba(22, 163, 74, 0.04);
+    }
+
+    .logo-icon svg {
+      width: 56px;
+      height: 56px;
+    }
+
+    .landing-title {
+      font-size: 32px;
+      font-weight: var(--fw-bold);
+      color: var(--gray-900);
+      line-height: 1.1;
+    }
+
+    .landing-subtitle {
+      font-size: var(--text-md);
+      color: var(--gray-500);
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    .landing-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding-bottom: var(--space-8);
+    }
+
+    /* Active session banner */
+    #active-session-banner {
+      display: none;
+      align-items: center;
+      gap: var(--space-2);
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border: 1px solid #F59E0B;
+      border-radius: var(--radius-md);
+      padding: 14px var(--space-4);
+      cursor: pointer;
+      animation: slide-up 0.3s ease-out;
+      transition: transform var(--transition-normal);
+    }
+
+    #active-session-banner:hover {
+      transform: translateY(-1px);
+    }
+
+    #active-session-banner.visible {
+      display: flex;
+    }
+
+    .banner-icon {
+      font-size: 20px;
+    }
+
+    .banner-text {
+      flex: 1;
+      text-align: left;
+    }
+
+    .banner-text strong {
+      display: block;
+      font-size: var(--text-md);
+      color: #92400E;
+      font-weight: var(--fw-semibold);
+    }
+
+    .banner-text span {
+      font-size: var(--text-xs);
+      color: #B45309;
+    }
+
+    /* ── Screen 2: QR Scanner ───────────────────────────────── */
+    #screen-scanner {
+      padding: 0;
+      background: #0D0D0D;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scanner-topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px var(--space-4);
+      padding-top: calc(16px + env(safe-area-inset-top));
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+    }
+
+    .scanner-btn {
+      height: 44px;
+      padding: 0 var(--space-4);
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-size: var(--text-md);
+      font-weight: var(--fw-medium);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all var(--transition-normal);
+    }
+
+    .scanner-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    #qr-reader {
+      width: 100%;
+      height: 100dvh;
+      position: relative;
+    }
+
+    #qr-reader video {
+      width: 100% !important;
+      height: 100dvh !important;
+      object-fit: cover;
+    }
+
+    /* Custom scanner overlay */
+    .scanner-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-6);
+    }
+
+    .scan-hint-top {
+      text-align: center;
+      margin-top: -40px;
+    }
+
+    .scan-hint-top p {
+      color: var(--white);
+      font-size: var(--text-md);
+      font-weight: var(--fw-medium);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .scan-frame {
+      width: 240px;
+      height: 240px;
+      position: relative;
+    }
+
+    .scan-frame-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: var(--primary-500);
+      border-style: solid;
+      border-width: 3px;
+      animation: pulse-frame 1.5s ease-in-out infinite;
+    }
+
+    .scan-frame-corner.tl {
+      top: 0;
+      left: 0;
+      border-right: none;
+      border-bottom: none;
+      border-radius: 4px 0 0 0;
+    }
+
+    .scan-frame-corner.tr {
+      top: 0;
+      right: 0;
+      border-left: none;
+      border-bottom: none;
+      border-radius: 0 4px 0 0;
+    }
+
+    .scan-frame-corner.bl {
+      bottom: 0;
+      left: 0;
+      border-right: none;
+      border-top: none;
+      border-radius: 0 0 0 4px;
+    }
+
+    .scan-frame-corner.br {
+      bottom: 0;
+      right: 0;
+      border-left: none;
+      border-top: none;
+      border-radius: 0 0 4px 0;
+    }
+
+    .scan-frame-line {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary-500), transparent);
+      animation: scan-move 2s ease-in-out infinite;
+      top: 8px;
+    }
+
+    .scan-frame-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(22, 163, 74, 0.05);
+      border-radius: 4px;
+    }
+
+    .scan-hint-bottom {
+      text-align: center;
+    }
+
+    .scan-hint-bottom p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: var(--text-xs);
+      line-height: 1.6;
+    }
+
+    /* Scan detected flash */
+    .scan-flash {
+      position: absolute;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      z-index: 30;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .scan-flash.flash {
+      opacity: 0.4;
+    }
+
+    /* hide html5-qrcode default UI */
+    #qr-reader>* {
+      position: absolute;
+      inset: 0;
+    }
+
+    #qr-reader img,
+    #qr-reader button,
+    #qr-reader select,
+    #qr-reader span:not(.scan-frame-corner):not(.scan-frame-line):not(.scan-frame-bg),
+    #qr-reader div:not(.scan-frame):not(.scanner-overlay):not(.scan-frame-corner):not(.scan-frame-line):not(.scan-frame-bg):not(.scan-hint-top):not(.scan-hint-bottom)>*:not(video) {
+      display: none !important;
+    }
+
+    /* ── Screen 3: Check-in Form ────────────────────────────── */
+    #screen-checkin {
+      gap: var(--space-5);
+    }
+
+    .screen-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary-500);
+      font-size: var(--text-md);
+      font-weight: var(--fw-medium);
+      cursor: pointer;
+      padding: var(--space-1) 0;
+      border: none;
+      background: none;
+      transition: color var(--transition-normal);
+    }
+
+    .screen-back:hover {
+      color: var(--primary-600);
+    }
+
+    .checkin-header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .checkin-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      flex: 1;
+    }
+
+    /* ── Screen 4: Active Session ───────────────────────────── */
+    #screen-active {
+      align-items: stretch;
+      gap: var(--space-5);
+    }
+
+    .session-header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      padding-top: var(--space-4);
+    }
+
+    .session-timer-card {
+      background: linear-gradient(135deg, var(--primary-50) 0%, #D1FAE5 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      text-align: center;
+      border: 1px solid var(--primary-100);
+    }
+
+    .timer-display {
+      font-family: var(--font-mono);
+      font-size: 54px;
+      font-weight: var(--fw-bold);
+      color: var(--primary-600);
+      letter-spacing: 3px;
+      line-height: 1;
+      display: block;
+      perspective: 200px;
+    }
+
+    .timer-display.warning {
+      color: var(--color-warning);
+    }
+
+    .timer-label {
+      font-size: var(--text-xs);
+      color: var(--gray-500);
+      margin-top: var(--space-2);
+      font-weight: var(--fw-medium);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .session-info-card {
+      background: var(--gray-50);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid var(--gray-200);
+    }
+
+    .session-info-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2) 0;
+    }
+
+    .session-info-row+.session-info-row {
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .session-info-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .session-info-label {
+      font-size: var(--text-xs);
+      color: var(--gray-500);
+      font-weight: var(--fw-medium);
+    }
+
+    .session-info-value {
+      font-size: var(--text-md);
+      color: var(--gray-900);
+      font-weight: var(--fw-semibold);
+    }
+
+    .active-spacer {
+      flex: 1;
+    }
+
+    /* ── Screen 5: Check-out Form ───────────────────────────── */
+    #screen-checkout {
+      gap: var(--space-5);
+    }
+
+    .stepper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+
+    .summary-card {
+      background: var(--gray-50);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      border: 1px solid var(--gray-200);
+    }
+
+    .summary-title {
+      font-size: var(--text-md);
+      font-weight: var(--fw-semibold);
+      color: var(--gray-700);
+      margin-bottom: var(--space-3);
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 6px 0;
+    }
+
+    .summary-row-label {
+      font-size: var(--text-sm);
+      color: var(--gray-500);
+      flex: 1;
+    }
+
+    .summary-row-value {
+      font-size: var(--text-sm);
+      font-weight: var(--fw-semibold);
+      color: var(--gray-900);
+    }
+
+    /* ── Screen 6: Session Complete ─────────────────────────── */
+    #screen-complete {
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      padding-top: var(--space-16);
+    }
+
+    .complete-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-5);
+      flex: 1;
+    }
+
+    .complete-icon {
+      font-size: 80px;
+      animation: success-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      display: block;
+    }
+
+    .complete-summary-card {
+      width: 100%;
+      max-width: 340px;
+      background: var(--primary-50);
+      border: 2px solid var(--primary-100);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      text-align: left;
+    }
+
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      z-index: 500;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      top: -20px;
+      animation: confetti-fall 3s ease-in forwards;
+    }
+
+    .complete-actions {
+      width: 100%;
+      padding-bottom: var(--space-8);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Offline Banner ──────────────────────────────────────── -->
+  <div id="offline-banner" role="status" aria-live="polite">
+    <span>📵</span>
+    <span>Tidak ada koneksi internet</span>
+  </div>
+
+  <!-- ── Toast Container ────────────────────────────────────── -->
+  <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ── Confetti ────────────────────────────────────────────── -->
+  <div class="confetti-container" id="confetti-container"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+     APP WRAPPER
+═══════════════════════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- ╔═══════════════════════════════════════════════════════
+       ║ SCREEN 1 — Landing
+       ╚═══════════════════════════════════════════════════════ -->
+    <section id="screen-landing" class="screen active fade-enter" aria-label="Landing">
+
+      <div class="landing-hero">
+        <!-- Logo -->
+        <div class="logo-icon" aria-hidden="true">
+          <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shuttlecock SVG -->
+            <ellipse cx="28" cy="36" rx="10" ry="6" fill="#16A34A" opacity="0.2" />
+            <path d="M28 10 C24 16 16 28 24 34 L28 36 L32 34 C40 28 32 16 28 10Z" fill="#16A34A" />
+            <path d="M28 10 L22 6 L16 14 L24 18 Z" fill="#4ADE80" opacity="0.9" />
+            <path d="M28 10 L30 4 L38 10 L32 16 Z" fill="#4ADE80" opacity="0.9" />
+            <path d="M28 10 L34 6 L40 14 L32 18 Z" fill="#4ADE80" opacity="0.9" />
+            <circle cx="28" cy="36" r="4" fill="#15803D" />
+          </svg>
+        </div>
+
+        <div>
+          <h1 class="landing-title">Badminton<br />Court Manager</h1>
+        </div>
+
+        <p class="landing-subtitle text-muted">
+          Scan QR Code lapangan untuk memulai atau melanjutkan sesi Anda
+        </p>
+      </div>
+
+      <div class="landing-actions">
+        <!-- Active session banner -->
+        <div id="active-session-banner" role="button" tabindex="0" aria-label="Lanjutkan sesi aktif">
+          <span class="banner-icon">⚡</span>
+          <div class="banner-text">
+            <strong>Sesi Aktif Ditemukan!</strong>
+            <span id="banner-session-info">Ketuk untuk melanjutkan</span>
+          </div>
+          <span>→</span>
+        </div>
+
+        <button id="btn-scan" class="btn btn-primary btn-full btn-lg" aria-label="Scan QR Code lapangan">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 3h5v5H3z" />
+            <path d="M3 11h2v2H3z" />
+            <path d="M3 16h5v5H3z" />
+            <path d="M11 3h2v2h-2z" />
+            <path d="M11 8h2v5h-2z" />
+            <path d="M16 3h5v5h-5z" />
+            <path d="M16 11h5v5h-5z" />
+            <path d="M11 16h2v5h-2z" />
+            <path d="M16 18h3v3h-3z" />
+          </svg>
+          Scan Lapangan
+        </button>
+
+        <a href="admin.html" class="btn btn-ghost btn-full" aria-label="Pergi ke halaman admin">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
+          Admin Panel
+        </a>
+      </div>
+    </section>
+
+    <!-- ╔═══════════════════════════════════════════════════════
+       ║ SCREEN 2 — QR Scanner
+       ╚═══════════════════════════════════════════════════════ -->
+    <section id="screen-scanner" class="screen" aria-label="QR Code Scanner">
+
+      <div class="scanner-topbar">
+        <button id="btn-cancel-scan" class="scanner-btn" aria-label="Batalkan scan">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Batal
+        </button>
+        <span style="color:white;font-size:var(--text-md);font-weight:var(--fw-semibold);">Scan Lapangan</span>
+        <div style="width:72px;"></div>
+      </div>
+
+      <!-- QR Reader container -->
+      <div id="qr-reader"></div>
+
+      <!-- Custom overlay -->
+      <div class="scanner-overlay" aria-hidden="true">
+        <div class="scan-hint-top">
+          <p>Arahkan kamera ke QR Code<br />pada papan lapangan</p>
+        </div>
+
+        <div class="scan-frame" role="img" aria-label="Area scan QR Code">
+          <div class="scan-frame-bg"></div>
+          <span class="scan-frame-corner tl"></span>
+          <span class="scan-frame-corner tr"></span>
+          <span class="scan-frame-corner bl"></span>
+          <span class="scan-frame-corner br"></span>
+          <div class="scan-frame-line"></div>
+        </div>
+
+        <div class="scan-hint-bottom">
+          <p>💡 Pastikan pencahayaan cukup<br />dan QR Code terlihat jelas</p>
+        </div>
+      </div>
+
+      <div class="scan-flash" id="scan-flash" aria-hidden="true"></div>
+    </section>
+
+    <!-- ╔═══════════════════════════════════════════════════════
+       ║ SCREEN 3 — Check-in Form
+       ╚═══════════════════════════════════════════════════════ -->
+    <section id="screen-checkin" class="screen" aria-label="Form Check-in">
+
+      <button class="screen-back" id="btn-back-checkin" aria-label="Scan ulang lapangan">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          aria-hidden="true">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        Scan Ulang
+      </button>
+
+      <div class="checkin-header">
+        <div id="court-badge" class="badge badge-primary" style="align-self:flex-start;">
+          📍 Lapangan A
+        </div>
+        <h1 class="text-h1">Konfirmasi Check-in</h1>
+        <p class="text-body-m text-muted">Isi informasi sesi Anda untuk mulai bermain</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <form class="checkin-form" id="form-checkin" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="pic-name">Nama PIC / Penanggung Jawab</label>
+          <input id="pic-name" type="text" class="form-input" placeholder="Contoh: Rizky Pratama" autocomplete="name"
+            inputmode="text" aria-label="Nama PIC" aria-describedby="pic-name-hint" aria-required="true" required />
+          <span id="pic-name-hint" class="form-hint">Nama yang bertanggung jawab atas sesi ini</span>
+          <span class="form-error" id="pic-name-error">Nama PIC wajib diisi</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="checkin-time">Waktu Mulai (Otomatis)</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;"
+              aria-hidden="true">🕐</span>
+            <input id="checkin-time" type="text" class="form-input" readonly aria-label="Waktu mulai otomatis"
+              style="padding-left:42px;font-weight:var(--fw-semibold);" />
+          </div>
+        </div>
+
+        <div style="flex:1;"></div>
+
+        <div style="display:flex;flex-direction:column;gap:var(--space-3);margin-top:auto;">
+          <button type="submit" id="btn-start-session" class="btn btn-primary btn-full btn-lg" aria-label="Mulai sesi">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Mulai Sesi
+          </button>
+          <button type="button" id="btn-rescan" class="btn btn-outline btn-full" aria-label="Scan lapangan lain">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <path d="M23 4v6h-6" />
+              <path d="M1 20v-6h6" />
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
+            Scan Lapangan Lain
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ╔═══════════════════════════════════════════════════════
+       ║ SCREEN 4 — Active Session
+       ╚═══════════════════════════════════════════════════════ -->
+    <section id="screen-active" class="screen" aria-label="Sesi Aktif">
+
+      <div class="session-header" style="padding-top:var(--space-6);">
+        <div class="badge badge-active" style="align-self:flex-start;">
+          <span class="live-dot" aria-hidden="true"></span>
+          Sesi Aktif
+        </div>
+        <h1 id="active-court-name" class="text-h1">Lapangan A</h1>
+        <p id="active-pic-name" class="text-h3 text-muted">—</p>
+      </div>
+
+      <!-- Live Timer -->
+      <div class="session-timer-card" role="timer" aria-label="Durasi sesi berlangsung" aria-live="off">
+        <span id="live-timer" class="timer-display" aria-label="Durasi sesi">00:00:00</span>
+        <p class="timer-label">Durasi Berlangsung</p>
+      </div>
+
+      <!-- Session Info -->
+      <div class="session-info-card">
+        <div class="session-info-row">
+          <span class="session-info-icon" aria-hidden="true">📅</span>
+          <div>
+            <div class="session-info-label">Check-in pada</div>
+            <div class="session-info-value" id="active-checkin-datetime">—</div>
+          </div>
+        </div>
+        <div class="session-info-row">
+          <span class="session-info-icon" aria-hidden="true">📍</span>
+          <div>
+            <div class="session-info-label">ID Lapangan</div>
+            <div class="session-info-value text-mono" id="active-court-id">—</div>
+          </div>
+        </div>
+        <div class="session-info-row">
+          <span class="session-info-icon" aria-hidden="true">🆔</span>
+          <div>
+            <div class="session-info-label">ID Transaksi</div>
+            <div class="session-info-value text-mono" id="active-txn-id"
+              style="font-size:var(--text-xs);color:var(--gray-500);">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="active-spacer"></div>
+
+      <button id="btn-checkout" class="btn btn-secondary btn-full btn-lg" aria-label="Check-out dan akhiri sesi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          aria-hidden="true">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Check-out
+      </button>
+    </section>
+
+    <!-- ╔═══════════════════════════════════════════════════════
+       ║ SCREEN 5 — Check-out Form
+       ╚═══════════════════════════════════════════════════════ -->
+    <section id="screen-checkout" class="screen" aria-label="Form Check-out">
+
+      <button class="screen-back" id="btn-back-checkout" aria-label="Kembali ke sesi aktif">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          aria-hidden="true">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
+        Batal
+      </button>
+
+      <div>
+        <h1 class="text-h1">Akhiri Sesi</h1>
+        <p class="text-body-m text-muted" id="checkout-subtitle">Lapangan A — —</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <form id="form-checkout" novalidate style="display:flex;flex-direction:column;gap:var(--space-6);flex:1;">
+
+        <!-- Jumlah Anggota -->
+        <div class="form-group">
+          <label class="form-label">Jumlah Anggota Hadir</label>
+          <div class="stepper-row">
+            <div class="stepper">
+              <button type="button" class="stepper-btn" id="btn-members-dec"
+                aria-label="Kurangi jumlah anggota">−</button>
+              <span class="stepper-value" id="val-members" aria-live="polite" aria-atomic="true" role="spinbutton"
+                aria-valuemin="1" aria-valuenow="2">2</span>
+              <button type="button" class="stepper-btn" id="btn-members-inc"
+                aria-label="Tambah jumlah anggota">+</button>
+            </div>
+            <span class="text-muted text-body-m">orang</span>
+          </div>
+        </div>
+
+        <!-- Shuttlecock -->
+        <div class="form-group">
+          <label class="form-label">Shuttlecock Baru Dipakai</label>
+          <div class="stepper-row">
+            <div class="stepper">
+              <button type="button" class="stepper-btn" id="btn-shuttle-dec" aria-label="Kurangi shuttlecock">−</button>
+              <span class="stepper-value" id="val-shuttle" aria-live="polite" aria-atomic="true" role="spinbutton"
+                aria-valuemin="0" aria-valuenow="0">0</span>
+              <button type="button" class="stepper-btn" id="btn-shuttle-inc" aria-label="Tambah shuttlecock">+</button>
+            </div>
+            <span class="text-muted text-body-m">buah</span>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-card">
+          <div class="summary-title">📋 Ringkasan Sesi</div>
+          <div class="summary-row">
+            <span class="summary-row-label">⏱ Durasi</span>
+            <span class="summary-row-value" id="checkout-duration">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">📍 Lapangan</span>
+            <span class="summary-row-value" id="checkout-court">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">🕐 Mulai</span>
+            <span class="summary-row-value" id="checkout-start">—</span>
+          </div>
+        </div>
+
+        <div style="flex:1;"></div>
+
+        <button type="submit" id="btn-finish-session" class="btn btn-secondary btn-full btn-lg"
+          aria-label="Selesaikan sesi">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            aria-hidden="true">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Selesaikan Sesi
+        </button>
+      </form>
+    </section>
+
+    <!-- ╔═══════════════════════════════════════════════════════
+       ║ SCREEN 6 — Session Complete
+       ╚═══════════════════════════════════════════════════════ -->
+    <section id="screen-complete" class="screen" aria-label="Sesi Selesai">
+
+      <div class="complete-hero">
+        <span class="complete-icon" aria-hidden="true" role="img">🎉</span>
+
+        <div>
+          <h1 class="text-display" style="color:var(--gray-900);">Sesi Selesai!</h1>
+        </div>
+
+        <p class="text-body-m text-muted" style="max-width:260px;line-height:1.7;">
+          Terima kasih telah menggunakan fasilitas lapangan kami.
+        </p>
+
+        <div class="complete-summary-card" id="complete-summary">
+          <div class="summary-row">
+            <span class="summary-row-label">📍 Lapangan</span>
+            <span class="summary-row-value" id="complete-court">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">⏱ Durasi</span>
+            <span class="summary-row-value" id="complete-duration">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">👥 Anggota</span>
+            <span class="summary-row-value" id="complete-members">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">🏸 Shuttlecock</span>
+            <span class="summary-row-value" id="complete-shuttle">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="complete-actions">
+        <button id="btn-new-session" class="btn btn-primary btn-full btn-lg" aria-label="Mulai sesi baru">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Mulai Sesi Baru
+        </button>
+      </div>
+    </section>
+
+  </div><!-- #app -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════ -->
+  <script>
+    'use strict';
+
+    /* ── Constants & Config ──────────────────────────────────── */
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI_nrI6IsdoB61ilcg8ho9IO5ehtBcbX33IiJYa4Wufw7TrWqUmm5VKu7VnwZNmIgx/exec'; // Fill in your Google Apps Script URL here
+    const LS_KEY = 'badminton_active_session';
+
+    /* ── State ───────────────────────────────────────────────── */
+    let currentCourt = null;
+    let currentSession = null;
+    let timerInterval = null;
+    let html5QrCode = null;
+    let membersCount = 2;
+    let shuttleCount = 0;
+    let membersPressTimer = null;
+    let shuttlePressTimer = null;
+
+    /* ── Utility: Get all screens ────────────────────────────── */
+    const screens = {
+      landing: document.getElementById('screen-landing'),
+      scanner: document.getElementById('screen-scanner'),
+      checkin: document.getElementById('screen-checkin'),
+      active: document.getElementById('screen-active'),
+      checkout: document.getElementById('screen-checkout'),
+      complete: document.getElementById('screen-complete'),
+    };
+
+    /* ── Screen Navigation ───────────────────────────────────── */
+    function showScreen(name, animation = 'fade') {
+      Object.values(screens).forEach(s => {
+        s.classList.remove('active', 'slide-up-enter', 'fade-enter');
+      });
+      const target = screens[name];
+      if (!target) return;
+      target.classList.add('active');
+      target.classList.add(animation === 'slide' ? 'slide-up-enter' : 'fade-enter');
+    }
+
+    /* ── Toast System ────────────────────────────────────────── */
+    function showToast(message, type = 'success', duration = 4000) {
+      const container = document.getElementById('toast-container');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.setAttribute('role', 'alert');
+      toast.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      const dismiss = () => {
+        toast.classList.add('toast-out');
+        setTimeout(() => toast.remove(), 300);
+      };
+      toast.addEventListener('click', dismiss);
+      setTimeout(dismiss, duration);
+    }
+
+    /* ── Offline Detection ───────────────────────────────────── */
+    const offlineBanner = document.getElementById('offline-banner');
+    function updateOnlineStatus() {
+      if (!navigator.onLine) {
+        offlineBanner.classList.add('visible');
+      } else {
+        offlineBanner.classList.remove('visible');
+        if (document.body.dataset.wasOffline === 'true') {
+          showToast('✅ Koneksi pulih. Silakan coba kembali.', 'success');
+        }
+        document.body.dataset.wasOffline = 'false';
+      }
+    }
+    window.addEventListener('online', () => { document.body.dataset.wasOffline = 'true'; updateOnlineStatus(); });
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    /* ── LocalStorage ────────────────────────────────────────── */
+    function saveSession(data) {
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+    }
+    function loadSession() {
+      try { return JSON.parse(localStorage.getItem(LS_KEY)); }
+      catch { return null; }
+    }
+    function clearSession() {
+      localStorage.removeItem(LS_KEY);
+    }
+
+    /* ── Timer ───────────────────────────────────────────────── */
+    function formatDuration(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+    }
+
+    function formatDurationHuman(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      if (h > 0) return `${h}j ${m}m ${s}d`;
+      if (m > 0) return `${m}m ${s}d`;
+      return `${s}d`;
+    }
+
+    function startTimer(checkInTimestamp) {
+      const timerEl = document.getElementById('live-timer');
+      if (timerInterval) clearInterval(timerInterval);
+
+      const update = () => {
+        const elapsed = Date.now() - checkInTimestamp;
+        const formatted = formatDuration(elapsed);
+        timerEl.textContent = formatted;
+        // Warn after 2 hours
+        timerEl.classList.toggle('warning', elapsed >= 7200000);
+      };
+      update();
+      timerInterval = setInterval(update, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    /* ── Datetime Formatter ──────────────────────────────────── */
+    function formatDateTime(timestamp) {
+      const d = new Date(timestamp);
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const dayName = days[d.getDay()];
+      const date = d.getDate();
+      const month = months[d.getMonth()];
+      const year = d.getFullYear();
+      const time = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+      return `${dayName}, ${date} ${month} ${year} — ${time}`;
+    }
+
+    function formatTime(timestamp) {
+      const d = new Date(timestamp);
+      return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+    }
+
+    /* ── QR Scanner ──────────────────────────────────────────── */
+    async function startScanner() {
+      showScreen('scanner', 'fade');
+
+      // Destroy previous instance
+      if (html5QrCode) {
+        try { await html5QrCode.stop(); } catch { }
+        html5QrCode = null;
+      }
+
+      // Clear and reinit
+      const container = document.getElementById('qr-reader');
+      container.innerHTML = '';
+
+      html5QrCode = new Html5Qrcode('qr-reader', { verbose: false });
+
+      const config = {
+        fps: 15,
+        qrbox: { width: 220, height: 220 },
+        aspectRatio: window.innerHeight / window.innerWidth,
+      };
+
+      try {
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          config,
+          onQRSuccess,
+          () => { }
+        );
+      } catch (err) {
+        console.error('Camera error:', err);
+        showScreen('landing', 'fade');
+        showToast('Tidak dapat mengakses kamera. Izinkan akses kamera di pengaturan browser.', 'error', 6000);
+      }
+    }
+
+    async function stopScanner() {
+      if (html5QrCode) {
+        try { await html5QrCode.stop(); } catch { }
+        html5QrCode = null;
+        document.getElementById('qr-reader').innerHTML = '';
+      }
+    }
+
+    function onQRSuccess(decodedText) {
+      // Stop scanner immediately
+      stopScanner();
+
+      // Flash feedback
+      const flash = document.getElementById('scan-flash');
+      flash.classList.add('flash');
+      setTimeout(() => flash.classList.remove('flash'), 200);
+
+      // Vibrate if supported
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+      // Parse court ID — accept format: COURT-01, LAPANGAN-A, A, etc.
+      // Normalize: extract court identifier
+      const raw = decodedText.trim().toUpperCase();
+      let courtId = raw;
+
+      // If it looks like a URL or JSON, try to extract court ID
+      if (raw.includes('COURT-')) {
+        const match = raw.match(/COURT-(\w+)/);
+        courtId = match ? `COURT-${match[1]}` : raw;
+      } else if (raw.includes('LAPANGAN')) {
+        courtId = raw;
+      }
+
+      currentCourt = courtId;
+
+      // Transition to check-in form with delay for feedback
+      setTimeout(() => {
+        showCheckinForm(courtId);
+      }, 500);
+    }
+
+    /* ── Check-in Form ───────────────────────────────────────── */
+    function showCheckinForm(courtId) {
+      // Update badge
+      document.getElementById('court-badge').textContent = `📍 ${courtId}`;
+
+      // Set live time
+      const updateTime = () => {
+        document.getElementById('checkin-time').value = formatTime(Date.now());
+      };
+      updateTime();
+
+      showScreen('checkin', 'slide');
+
+      // Reset form
+      const nameInput = document.getElementById('pic-name');
+      nameInput.value = '';
+      nameInput.classList.remove('error');
+      document.getElementById('pic-name-error').style.display = 'none';
+
+      // Focus name input after transition
+      setTimeout(() => nameInput.focus(), 350);
+    }
+
+    /* ── Check-in Submit ─────────────────────────────────────── */
+    document.getElementById('form-checkin').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('pic-name');
+      const name = nameInput.value.trim();
+
+      // Validation
+      if (!name) {
+        nameInput.classList.add('error');
+        document.getElementById('pic-name-error').style.display = 'block';
+        nameInput.focus();
+        return;
+      }
+      nameInput.classList.remove('error');
+      document.getElementById('pic-name-error').style.display = 'none';
+
+      if (!navigator.onLine) {
+        showToast('Tidak ada koneksi internet. Coba lagi setelah terhubung.', 'error');
+        return;
+      }
+
+      // Loading state
+      const btn = document.getElementById('btn-start-session');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Memulai Sesi...';
+
+      const checkInTime = Date.now();
+      const txnId = 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+
+      try {
+        // API call (mock if no GAS_URL)
+        if (GAS_URL) {
+          const formData = new URLSearchParams({
+            action: 'checkin',
+            id_transaksi: txnId,
+            waktu_checkin: new Date(checkInTime).toISOString(),
+            nama_pic: name,
+            id_lapangan: currentCourt,
+          });
+          await fetch(GAS_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            body: formData,
+          });
+        } else {
+          // Simulate network delay
+          await new Promise(r => setTimeout(r, 800));
+        }
+
+        // Save to LocalStorage
+        const sessionData = {
+          txnId,
+          courtId: currentCourt,
+          picName: name,
+          checkInTime,
+        };
+        saveSession(sessionData);
+        currentSession = sessionData;
+
+        showToast('Sesi berhasil dimulai! Selamat bermain 🏸', 'success');
+        showActiveSession(sessionData);
+
+      } catch (err) {
+        console.error(err);
+        showToast('Gagal memulai sesi. Periksa koneksi internet Anda.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Mulai Sesi';
+      }
+    });
+
+    /* ── Active Session Screen ───────────────────────────────── */
+    function showActiveSession(session) {
+      document.getElementById('active-court-name').textContent = session.courtId;
+      document.getElementById('active-pic-name').textContent = session.picName;
+      document.getElementById('active-court-id').textContent = session.courtId;
+      document.getElementById('active-txn-id').textContent = session.txnId;
+      document.getElementById('active-checkin-datetime').textContent = formatDateTime(session.checkInTime);
+
+      startTimer(session.checkInTime);
+      showScreen('active', 'fade');
+    }
+
+    /* ── Check-out Screen ────────────────────────────────────── */
+    function showCheckoutForm() {
+      const session = currentSession || loadSession();
+      if (!session) { showScreen('landing', 'fade'); return; }
+
+      // Populate summary
+      document.getElementById('checkout-subtitle').textContent = `${session.courtId} — ${session.picName}`;
+      document.getElementById('checkout-court').textContent = session.courtId;
+      document.getElementById('checkout-start').textContent = formatTime(session.checkInTime);
+
+      const elapsed = Date.now() - session.checkInTime;
+      document.getElementById('checkout-duration').textContent = formatDurationHuman(elapsed);
+
+      // Reset steppers
+      membersCount = 2;
+      shuttleCount = 0;
+      updateStepper('members', membersCount);
+      updateStepper('shuttle', shuttleCount);
+
+      showScreen('checkout', 'slide');
+
+      // Keep updating duration
+      if (timerInterval) {
+        const durationEl = document.getElementById('checkout-duration');
+        const durationInterval = setInterval(() => {
+          const el = Date.now() - session.checkInTime;
+          durationEl.textContent = formatDurationHuman(el);
+        }, 1000);
+        // cleanup on next navigation
+        screens.checkout._durationInterval = durationInterval;
+      }
+    }
+
+    /* ── Stepper Logic ───────────────────────────────────────── */
+    function updateStepper(type, value) {
+      const el = document.getElementById(`val-${type}`);
+      el.textContent = value;
+      el.setAttribute('aria-valuenow', value);
+
+      if (type === 'members') {
+        document.getElementById('btn-members-dec').disabled = value <= 1;
+      } else {
+        document.getElementById('btn-shuttle-dec').disabled = value <= 0;
+      }
+    }
+
+    function setupStepper(type, minVal) {
+      const incId = `btn-${type === 'members' ? 'members' : 'shuttle'}-inc`;
+      const decId = `btn-${type === 'members' ? 'members' : 'shuttle'}-dec`;
+
+      const getVal = () => type === 'members' ? membersCount : shuttleCount;
+      const setVal = v => {
+        if (type === 'members') membersCount = v;
+        else shuttleCount = v;
+        updateStepper(type === 'members' ? 'members' : 'shuttle', v);
+      };
+
+      const incEl = document.getElementById(incId);
+      const decEl = document.getElementById(decId);
+
+      // Click
+      incEl.addEventListener('click', () => setVal(getVal() + 1));
+      decEl.addEventListener('click', () => { if (getVal() > minVal) setVal(getVal() - 1); });
+
+      // Long-press for rapid change
+      const startRapid = (dir) => {
+        const interval = setInterval(() => {
+          if (dir === 1) setVal(getVal() + 1);
+          else if (getVal() > minVal) setVal(getVal() - 1);
+        }, 150);
+        return interval;
+      };
+
+      let pressTimer;
+      incEl.addEventListener('pointerdown', () => { pressTimer = setTimeout(() => { pressTimer = startRapid(1); }, 400); });
+      decEl.addEventListener('pointerdown', () => { pressTimer = setTimeout(() => { pressTimer = startRapid(-1); }, 400); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => {
+        incEl.addEventListener(ev, () => clearInterval(pressTimer));
+        decEl.addEventListener(ev, () => clearInterval(pressTimer));
+      });
+    }
+
+    setupStepper('members', 1);
+    setupStepper('shuttle', 0);
+
+    /* ── Check-out Submit ────────────────────────────────────── */
+    document.getElementById('form-checkout').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const session = currentSession || loadSession();
+      if (!session) { showScreen('landing', 'fade'); return; }
+
+      if (!navigator.onLine) {
+        showToast('Tidak ada koneksi internet. Coba lagi setelah terhubung.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-finish-session');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-spinner"></span> Menyelesaikan...';
+
+      const checkOutTime = Date.now();
+
+      try {
+        if (GAS_URL) {
+          const formData = new URLSearchParams({
+            action: 'checkout',
+            id_transaksi: session.txnId,
+            waktu_checkout: new Date(checkOutTime).toISOString(),
+            jumlah_anggota: membersCount,
+            shuttlecock_terpakai: shuttleCount,
+          });
+          await fetch(GAS_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            body: formData,
+          });
+        } else {
+          await new Promise(r => setTimeout(r, 800));
+        }
+
+        // Show complete screen
+        const elapsed = checkOutTime - session.checkInTime;
+        showCompleteScreen(session, elapsed, membersCount, shuttleCount);
+
+        // Cleanup
+        stopTimer();
+        clearSession();
+        currentSession = null;
+
+        // Confetti!
+        launchConfetti();
+
+        showToast('Sesi berhasil diselesaikan! Sampai jumpa 👋', 'success', 5000);
+
+      } catch (err) {
+        console.error(err);
+        showToast('Gagal menyelesaikan sesi. Periksa koneksi internet Anda.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Selesaikan Sesi';
+      }
+    });
+
+    /* ── Session Complete ────────────────────────────────────── */
+    function showCompleteScreen(session, elapsedMs, members, shuttle) {
+      document.getElementById('complete-court').textContent = session.courtId;
+      document.getElementById('complete-duration').textContent = formatDurationHuman(elapsedMs);
+      document.getElementById('complete-members').textContent = `${members} orang`;
+      document.getElementById('complete-shuttle').textContent = `${shuttle} buah`;
+      showScreen('complete', 'fade');
+    }
+
+    /* ── Confetti ────────────────────────────────────────────── */
+    function launchConfetti() {
+      const container = document.getElementById('confetti-container');
+      container.innerHTML = '';
+      const colors = ['#16A34A', '#4ADE80', '#FCD34D', '#F87171', '#60A5FA', '#C084FC', '#FB923C'];
+
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-delay: ${Math.random() * 1.5}s;
+      animation-duration: ${2 + Math.random() * 2}s;
+    `;
+        container.appendChild(piece);
+      }
+
+      setTimeout(() => { container.innerHTML = ''; }, 5000);
+    }
+
+    /* ── Active Session Banner ───────────────────────────────── */
+    function checkExistingSession() {
+      const session = loadSession();
+      if (session) {
+        currentSession = session;
+        const banner = document.getElementById('active-session-banner');
+        const info = document.getElementById('banner-session-info');
+        info.textContent = `${session.courtId} · ${session.picName}`;
+        banner.classList.add('visible');
+        banner.classList.remove('hidden');
+      }
+    }
+
+    /* ── Event Listeners ─────────────────────────────────────── */
+
+    // Landing: Scan button
+    document.getElementById('btn-scan').addEventListener('click', startScanner);
+
+    // Landing: Active session banner
+    document.getElementById('active-session-banner').addEventListener('click', () => {
+      const session = loadSession();
+      if (session) { currentSession = session; showActiveSession(session); }
+    });
+    document.getElementById('active-session-banner').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click();
+    });
+
+    // Scanner: Cancel
+    document.getElementById('btn-cancel-scan').addEventListener('click', async () => {
+      await stopScanner();
+      showScreen('landing', 'fade');
+    });
+
+    // Check-in form: Back / Rescan
+    document.getElementById('btn-back-checkin').addEventListener('click', startScanner);
+    document.getElementById('btn-rescan').addEventListener('click', startScanner);
+
+    // Name input: clear error on typing
+    document.getElementById('pic-name').addEventListener('input', function () {
+      this.classList.remove('error');
+      document.getElementById('pic-name-error').style.display = 'none';
+    });
+
+    // Active screen: Checkout button
+    document.getElementById('btn-checkout').addEventListener('click', showCheckoutForm);
+
+    // Checkout: Back button
+    document.getElementById('btn-back-checkout').addEventListener('click', () => {
+      if (screens.checkout._durationInterval) clearInterval(screens.checkout._durationInterval);
+      const session = currentSession || loadSession();
+      if (session) showActiveSession(session);
+      else showScreen('landing', 'fade');
+    });
+
+    // Complete: New session
+    document.getElementById('btn-new-session').addEventListener('click', () => {
+      showScreen('landing', 'fade');
+      checkExistingSession();
+    });
+
+    /* ── Init ────────────────────────────────────────────────── */
+    function init() {
+      // Check LocalStorage for active session
+      const session = loadSession();
+      if (session) {
+        currentSession = session;
+        // Go directly to active session screen
+        showActiveSession(session);
+        checkExistingSession();
+      } else {
+        showScreen('landing', 'fade');
+        checkExistingSession();
+      }
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
