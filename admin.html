@@ -1782,7 +1782,7 @@ async function switchPanel(name) {
     
     // Perbarui filter dan render ulang tabel
     populateCourtFilter();
-    renderLogTable(); 
+    applyFilters(); // ✅ GANTI renderLogTable() menjadi applyFilters()
   }
 }
 
@@ -2073,32 +2073,26 @@ async function switchPanel(name) {
     }
 
     function applyFilters() {
-      const query = document.getElementById('search-log').value.toLowerCase();
-      const status = document.getElementById('filter-status').value;
-      const court = document.getElementById('filter-court').value;
+     // Filter events
+document.getElementById('search-log').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+document.getElementById('filter-status').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+document.getElementById('filter-court').addEventListener('change', () => { currentPage = 1; applyFilters(); });
 
-      filteredData = allData.filter(d => {
-        const matchQuery = !query || d.txnId.toLowerCase().includes(query) || d.picName.toLowerCase().includes(query) || d.courtId.toLowerCase().includes(query);
-        const matchStatus = !status || d.status === status;
-        const matchCourt = !court || d.courtId === court;
-        return matchQuery && matchStatus && matchCourt;
-      });
-
-      // Sort
-      filteredData.sort((a, b) => {
-        let av = a[sortKey], bv = b[sortKey];
-        if (av == null) av = 0;
-        if (bv == null) bv = 0;
-        if (typeof av === 'string') return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
-        return sortDir === 'asc' ? av - bv : bv - av;
-      });
-
-      currentPage = 1;
-      renderLogTable();
+// Sort
+document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    else { sortKey = key; sortDir = 'desc'; }
+    document.querySelectorAll('.data-table th').forEach(h => h.classList.remove('sorted'));
+    th.classList.add('sorted');
+    currentPage = 1;
+    applyFilters(); // <--- Ubah di sini
+  });
+});
     }
 
     function renderLogTable() {
-      applyFilters();
       const tbody = document.getElementById('log-table-body');
       const total = filteredData.length;
       const start = (currentPage - 1) * PAGE_SIZE;
