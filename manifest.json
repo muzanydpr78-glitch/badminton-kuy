@@ -7,12 +7,12 @@
   "theme_color": "#17A34B",
   "icons": [
     {
-      "src": "https://github.com/muzanydpr78-glitch/badminton-kuy/blob/main/icon_192.png?raw=true",
+      "src": "https://github.com/muzanydpr78-glitch/badminton-kuy/blob/main/icon_192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://github.com/muzanydpr78-glitch/badminton-kuy/blob/main/icon_512.png?raw=true",
+      "src": "https://github.com/muzanydpr78-glitch/badminton-kuy/blob/main/icon_512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
