@@ -731,15 +731,29 @@
 
     document.getElementById('btn-refresh-qr').addEventListener('click', fetchAndRenderQRList);
 
-    window.previewQR = function(courtName) {
+   window.previewQR = function(courtName) {
+      const section = document.getElementById('print-section');
+      section.style.display = 'block';
+      
       const container = document.getElementById('qrcode-display');
       container.innerHTML = '';
       document.getElementById('print-court-name').textContent = courtName;
-      new QRCode(container, { text: courtName, width: 200, height: 200 });
-      document.getElementById('print-section').style.display = 'block';
+      
+      // Berikan jeda sekejap agar elemen tampil di DOM sebelum library QR merender
+      setTimeout(() => {
+        new QRCode(container, { 
+          text: courtName, 
+          width: 200, 
+          height: 200,
+          colorDark : "#1e293b",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.H
+        });
+      }, 50);
+
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
-
+    
     // Download Kartu QR sebagai JPG menggunakan html2canvas
     document.getElementById('btn-download-jpg').addEventListener('click', function() {
       const printSection = document.getElementById('print-section');
