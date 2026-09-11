@@ -498,9 +498,6 @@
 
         // Fallback jika sheet kosong/belum terinisialisasi
         let matchedAdmin = admins.find(a => String(a.password) === String(password));
-        if (!matchedAdmin && password === 'admin123') {
-          matchedAdmin = { namaAdmin: 'Administrator Utama', role: 'Administrator' };
-        }
 
         if (matchedAdmin) {
           sessionStorage.setItem(LS_ADMIN_KEY, 'true');
