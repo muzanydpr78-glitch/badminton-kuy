@@ -515,23 +515,7 @@
           errorEl.classList.add('visible');
           document.getElementById('admin-password').value = '';
         }
-      } catch (err) {
-        // Offline / fallback ke password default lokal jika gagal koneksi
-        if (password === 'admin123') {
-          sessionStorage.setItem(LS_ADMIN_KEY, 'true');
-          sessionStorage.setItem('admin_role', 'Administrator');
-          sessionStorage.setItem('admin_name', 'Administrator Utama');
-          currentAdminRole = 'Administrator';
-          currentAdminName = 'Administrator Utama';
-          document.getElementById('screen-login').classList.remove('active');
-          document.getElementById('admin-layout').classList.add('active');
-          applyRolePermissions();
-          initDashboard();
-          showToast('Login Offline Berhasil', 'warning');
-        } else {
-          errorEl.classList.add('visible');
-        }
-      }
+    
       btn.disabled = false;
       btn.innerHTML = 'Masuk ke Panel';
     });
