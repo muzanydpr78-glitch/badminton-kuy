@@ -4,257 +4,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="BadmintonKuy System — Admin Panel untuk monitoring dan manajemen data lapangan badminton." />
-  <meta name="robots" content="noindex, nofollow" />
   <title>Admin Panel — BadmintonKuy System</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="manifest" href="manifest.json">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
   <style>
     body { background: #0F0F11; min-height: 100vh; }
     .admin-screen { display: none; }
     .admin-screen.active { display: block; }
-
-    #screen-login {
-      min-height: 100vh; display: none; align-items: center; justify-content: center;
-      padding: var(--space-4); background: linear-gradient(135deg, #0F0F11 0%, #1A0505 50%, #0F0F11 100%);
-      position: relative; overflow: hidden;
-    }
+    #screen-login { min-height: 100vh; display: none; align-items: center; justify-content: center; padding: var(--space-4); background: linear-gradient(135deg, #0F0F11 0%, #1A0505 50%, #0F0F11 100%); }
     #screen-login.active { display: flex; }
-    .login-bg-decoration { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-    .login-bg-circle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(155, 28, 28, 0.15) 0%, transparent 70%); }
-    .login-bg-circle.c1 { width: 600px; height: 600px; top: -200px; right: -200px; }
-    .login-bg-circle.c2 { width: 400px; height: 400px; bottom: -100px; left: -150px; }
-    .login-card {
-      background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-2xl);
-      padding: var(--space-8); width: 100%; max-width: 420px; animation: slide-up 0.5s ease-out;
-    }
+    .login-card { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-2xl); padding: var(--space-8); width: 100%; max-width: 420px; }
     .login-logo { text-align: center; margin-bottom: var(--space-8); }
-    .login-logo-icon {
-      width: 72px; height: 72px; background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
-      border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;
-      margin: 0 auto var(--space-4); box-shadow: 0 8px 32px rgba(155, 28, 28, 0.4);
-    }
-    .login-logo-icon svg { width: 40px; height: 40px; }
-    .login-logo h1 { font-size: var(--text-xl); font-weight: var(--fw-bold); color: var(--white); }
-    .login-logo p { font-size: var(--text-md); color: rgba(255, 255, 255, 0.5); margin-top: 4px; }
-    .login-divider { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-6); }
-    .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
-    .login-divider span { font-size: var(--text-xs); color: rgba(255, 255, 255, 0.4); white-space: nowrap; }
+    .login-logo-icon { width: 72px; height: 72px; background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-4); }
+    .login-logo h1 { font-size: var(--text-xl); color: var(--white); }
+    .login-logo p { font-size: var(--text-md); color: rgba(255, 255, 255, 0.5); }
     .login-form { display: flex; flex-direction: column; gap: var(--space-4); }
-    .login-form .form-label { color: rgba(255, 255, 255, 0.7); }
-    .login-form .form-input { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); color: var(--white); }
-    .login-form .form-input::placeholder { color: rgba(255, 255, 255, 0.3); }
-    .login-form .form-input:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(155, 28, 28, 0.25); background: rgba(255, 255, 255, 0.08); }
-    .login-form .input-toggle { color: rgba(255, 255, 255, 0.5); }
-    .login-form .input-toggle:hover { color: rgba(255, 255, 255, 0.8); }
-    #login-error {
-      background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.3);
-      border-radius: var(--radius-sm); padding: 12px var(--space-4); color: #FCA5A5;
-      font-size: var(--text-md); display: none; text-align: center; animation: slide-up 0.2s ease-out;
-    }
+    .form-input { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); color: var(--white); padding: 12px; border-radius: var(--radius-sm); width: 100%; outline: none; }
+    #login-error { background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.3); padding: 10px; color: #FCA5A5; display: none; text-align: center; border-radius: var(--radius-sm); }
     #login-error.visible { display: block; }
-
     #admin-layout { display: none; min-height: 100vh; background: var(--gray-50); }
     #admin-layout.active { display: block; }
-
-    .admin-navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px;
-      background: rgba(15, 15, 17, 0.95); backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center;
-      padding: 0 var(--space-6); gap: var(--space-4);
-    }
-    .navbar-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; flex-shrink: 0; }
-    .navbar-brand-icon {
-      width: 36px; height: 36px; background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
-      border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px;
-    }
-    .navbar-brand-text { font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--white); }
-    .navbar-brand-sub { font-size: var(--text-xs); color: rgba(255, 255, 255, 0.45); }
-    .navbar-nav { display: flex; align-items: center; gap: 4px; margin-left: var(--space-6); flex: 1; }
-    .nav-link {
-      display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 var(--space-4);
-      border-radius: var(--radius-sm); font-size: var(--text-md); font-weight: var(--fw-medium);
-      color: rgba(255, 255, 255, 0.6); cursor: pointer; transition: all var(--transition-normal); border: none; background: none;
-    }
-    .nav-link:hover { color: var(--white); background: rgba(255, 255, 255, 0.08); }
-    .nav-link.active { color: var(--white); background: rgba(155, 28, 28, 0.4); }
-    .nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
-
+    .admin-navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px; background: rgba(15, 15, 17, 0.95); display: flex; align-items: center; padding: 0 var(--space-6); gap: var(--space-4); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .navbar-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; color: var(--white); }
+    .navbar-brand-icon { width: 36px; height: 36px; background: var(--maroon-700); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+    .navbar-nav { display: flex; gap: 4px; margin-left: var(--space-6); flex: 1; }
+    .nav-link { height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-sm); font-size: var(--text-md); color: rgba(255,255,255,0.6); cursor: pointer; border: none; background: none; }
+    .nav-link:hover, .nav-link.active { color: var(--white); background: rgba(155, 28, 28, 0.4); }
     .navbar-right { display: flex; align-items: center; gap: var(--space-3); margin-left: auto; }
-    .navbar-logout {
-      display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 var(--space-4);
-      border-radius: var(--radius-sm); font-size: var(--text-md); font-weight: var(--fw-medium);
-      color: rgba(255, 255, 255, 0.6); cursor: pointer; transition: all var(--transition-normal);
-      border: 1px solid rgba(255, 255, 255, 0.12); background: none;
-    }
-    .navbar-logout:hover { color: #FCA5A5; border-color: rgba(220, 38, 38, 0.4); background: rgba(220, 38, 38, 0.1); }
-
-    .navbar-hamburger {
-      display: none; background: none; border: none; cursor: pointer; width: 40px; height: 40px;
-      align-items: center; justify-content: center; border-radius: var(--radius-sm); color: var(--white);
-      margin-left: auto; flex-direction: column; gap: 5px; padding: 8px; transition: background var(--transition-normal);
-    }
-    .navbar-hamburger:hover { background: rgba(255, 255, 255, 0.1); }
-    .hamburger-line { width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: all 0.25s ease; display: block; }
-
-    .mobile-drawer-overlay {
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 200;
-      opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease;
-    }
-    .mobile-drawer-overlay.active { opacity: 1; visibility: visible; }
-    .mobile-drawer {
-      position: fixed; top: 0; right: 0; bottom: 0; width: 280px; background: #1A1A1E; z-index: 201;
-      transform: translateX(100%); transition: transform 0.25s ease-out; display: flex; flex-direction: column; padding: var(--space-6); gap: var(--space-2);
-    }
-    .mobile-drawer.active { transform: translateX(0); }
-    .drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-    .drawer-title { color: var(--white); font-weight: var(--fw-semibold); font-size: var(--text-md); }
-    .drawer-close { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: none; cursor: pointer; color: var(--white); font-size: 18px; display: flex; align-items: center; justify-content: center; }
-    .drawer-nav-link {
-      display: flex; align-items: center; gap: var(--space-3); height: 48px; padding: 0 var(--space-4);
-      border-radius: var(--radius-sm); color: rgba(255, 255, 255, 0.7); font-size: var(--text-base); font-weight: var(--fw-medium);
-      cursor: pointer; border: none; background: none; transition: all var(--transition-normal); width: 100%;
-    }
-    .drawer-nav-link:hover { color: var(--white); background: rgba(255, 255, 255, 0.08); }
-    .drawer-nav-link.active { color: var(--white); background: rgba(155, 28, 28, 0.4); }
-    .drawer-logout { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: var(--space-4); }
-
+    .navbar-logout { height: 38px; padding: 0 var(--space-4); border-radius: var(--radius-sm); color: #FCA5A5; border: 1px solid rgba(220, 38, 38, 0.4); background: rgba(220, 38, 38, 0.1); cursor: pointer; }
     .admin-content { padding-top: 64px; }
     .admin-panel { display: none; min-height: calc(100vh - 64px); }
     .admin-panel.active { display: block; }
-    .admin-page-header { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: var(--space-6) var(--space-8); }
-    @media (max-width: 768px) { .admin-page-header { padding: var(--space-4); } }
+    .admin-page-header { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: var(--space-6) var(--space-8); display: flex; justify-content: space-between; align-items: center; }
     .page-title { font-size: var(--text-xl); font-weight: var(--fw-bold); color: var(--gray-900); }
-    .page-subtitle { font-size: var(--text-md); color: var(--gray-500); margin-top: 4px; }
-    .page-date { font-size: var(--text-md); color: var(--gray-500); }
-
-    #panel-dashboard .content-area, #panel-log .content-area, #panel-qr .content-area, #panel-settings .content-area, #panel-admin-mgmt .content-area {
-      padding: var(--space-6) var(--space-8); display: flex; flex-direction: column; gap: var(--space-6);
-    }
-    @media (max-width: 768px) {
-      #panel-dashboard .content-area, #panel-log .content-area, #panel-qr .content-area, #panel-settings .content-area, #panel-admin-mgmt .content-area { padding: var(--space-4); }
-    }
-
-    .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
-    @media (max-width: 1024px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 480px) { .summary-cards { grid-template-columns: 1fr; } }
-    .summary-card {
-      background: var(--white); border-radius: var(--radius-lg); padding: var(--space-5);
-      border-left: 4px solid var(--gray-300); box-shadow: var(--shadow-1); opacity: 0; transform: translateY(20px);
-      transition: box-shadow var(--transition-normal), transform var(--transition-normal);
-    }
-    .summary-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
-    .summary-card.animate-in { animation: stagger-in 0.3s ease-out forwards; }
-    .summary-card:nth-child(1) { animation-delay: 0ms; border-left-color: var(--gray-400); }
-    .summary-card:nth-child(2) { animation-delay: 80ms; border-left-color: var(--maroon-700); }
-    .summary-card:nth-child(3) { animation-delay: 160ms; border-left-color: var(--primary-500); }
-    .summary-card:nth-child(4) { animation-delay: 240ms; border-left-color: var(--color-info); }
-    .card-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: var(--space-4); }
-    .card-icon.gray { background: var(--gray-100); }
-    .card-icon.maroon { background: var(--maroon-100); }
-    .card-icon.green { background: var(--primary-100); }
-    .card-icon.blue { background: #DBEAFE; }
-    .card-value { font-size: 36px; font-weight: var(--fw-bold); color: var(--gray-900); line-height: 1; margin-bottom: 6px; animation: counter-up 0.4s ease-out; }
-    .card-label { font-size: var(--text-xs); color: var(--gray-500); font-weight: var(--fw-medium); text-transform: uppercase; letter-spacing: 0.5px; }
-    .card-trend { font-size: var(--text-xs); color: var(--primary-500); margin-top: 6px; font-weight: var(--fw-medium); }
-
-    .live-courts-section { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); overflow: hidden; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--gray-200); }
-    .section-title { font-size: var(--text-lg); font-weight: var(--fw-semibold); color: var(--gray-900); }
-    .btn-refresh {
-      display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 var(--space-3);
-      border-radius: var(--radius-sm); background: var(--gray-100); border: none; cursor: pointer;
-      font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--gray-700); transition: all var(--transition-normal);
-    }
-    .btn-refresh:hover { background: var(--gray-200); }
-    .btn-refresh.spinning svg { animation: spin 0.8s linear infinite; }
-
-    .live-table, .data-table { width: 100%; border-collapse: collapse; }
-    .live-table th, .data-table th {
-      text-align: left; padding: 12px var(--space-6); font-size: var(--text-xs); font-weight: var(--fw-semibold);
-      color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
-    }
-    .live-table td, .data-table td { padding: var(--space-4) var(--space-6); font-size: var(--text-md); color: var(--gray-900); border-bottom: 1px solid var(--gray-100); }
-    .live-table tr:hover td, .data-table tr:hover td { background: var(--gray-50); }
-    .court-live-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-semibold); color: #991B1B; }
-    .live-duration { font-family: var(--font-mono); font-weight: var(--fw-semibold); color: var(--primary-600); }
-    .empty-state { text-align: center; padding: var(--space-12) var(--space-6); color: var(--gray-500); }
-    .empty-state-icon { font-size: 48px; margin-bottom: var(--space-4); }
-
-    .log-toolbar { display: flex; align-items: center; gap: var(--space-3); background: var(--white); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); flex-wrap: wrap; }
-    .search-wrapper { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; background: var(--gray-100); border-radius: var(--radius-sm); padding: 0 var(--space-3); border: 1.5px solid transparent; }
-    .search-wrapper:focus-within { border-color: var(--maroon-700); background: var(--white); }
-    .search-input { flex: 1; height: 40px; border: none; background: transparent; font-size: var(--text-md); outline: none; }
-    .filter-select { height: 44px; padding: 0 var(--space-4); border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); font-size: var(--text-md); background: var(--white); cursor: pointer; outline: none; }
-
+    .page-subtitle { font-size: var(--text-md); color: var(--gray-500); }
+    .content-area { padding: var(--space-6) var(--space-8); }
     .table-container { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); overflow: hidden; }
-    .txn-id { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--gray-500); }
-    .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: var(--fw-semibold); }
-    .status-active { background: var(--primary-100); color: var(--primary-700); }
-    .status-completed { background: var(--gray-100); color: var(--gray-500); }
-    .action-btns { display: flex; gap: 6px; align-items: center; }
-    .action-btn { width: 34px; height: 34px; border-radius: var(--radius-xs); border: 1px solid var(--gray-200); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-600); }
-    .action-btn.edit:hover { background: #EFF6FF; color: var(--color-info); }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { text-align: left; padding: 12px var(--space-6); font-size: var(--text-xs); color: var(--gray-500); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+    .data-table td { padding: var(--space-4) var(--space-6); font-size: var(--text-md); color: var(--gray-900); border-bottom: 1px solid var(--gray-100); }
+    
+    /* Modal Styling */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: none; align-items: center; justify-content: center; }
+    .modal-backdrop.active { display: flex; }
+    .modal-box { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 480px; padding: var(--space-6); box-shadow: var(--shadow-2); animation: slide-up 0.3s ease; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
+    .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--gray-500); }
+    .action-btn { width: 34px; height: 34px; border-radius: var(--radius-xs); border: 1px solid var(--gray-200); background: var(--white); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--gray-600); }
     .action-btn.delete:hover { background: #FEF2F2; color: var(--color-error); }
-
-    .table-footer { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--gray-200); flex-wrap: wrap; gap: var(--space-3); }
-    .pagination { display: flex; gap: 4px; align-items: center; }
-    .page-btn { width: 36px; height: 36px; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .page-btn.active { background: var(--maroon-700); color: var(--white); border-color: var(--maroon-700); }
-
-    @media (max-width: 768px) {
-      .navbar-nav, .navbar-logout { display: none !important; }
-      .navbar-hamburger { display: flex !important; }
-    }
-    @media (min-width: 769px) {
-      .mobile-drawer-overlay, .mobile-drawer { display: none !important; }
-    }
-    @media print {
-      body * { visibility: hidden; }
-      #print-section, #print-section * { visibility: visible; }
-      #print-section { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 100%; margin-top: 2cm; text-align: center; }
-      .qr-controls { display: none !important; }
-      #admin-layout { background: transparent !important; }
-    }
   </style>
 </head>
 
 <body>
-  <div id="toast-container" role="status" aria-live="polite"></div>
-  <div id="offline-banner" role="status"><span>📵</span><span>Tidak ada koneksi internet</span></div>
+  <div id="toast-container" role="status"></div>
 
   <!-- SCREEN LOGIN -->
   <div id="screen-login" class="admin-screen active">
-    <div class="login-bg-decoration"><div class="login-bg-circle c1"></div><div class="login-bg-circle c2"></div></div>
     <div class="login-card">
       <div class="login-logo">
-        <div class="login-logo-icon">
-          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 6 C16 12 8 24 16 30 L20 32 L24 30 C32 24 24 12 20 6Z" fill="white" opacity="0.9"/>
-            <circle cx="20" cy="32" r="3" fill="white" opacity="0.8"/>
-          </svg>
-        </div>
+        <div class="login-logo-icon">🏸</div>
         <h1>Badminton Admin</h1>
         <p>Court Management System</p>
       </div>
-      <div class="login-divider"><span>ADMIN ACCESS</span></div>
       <form class="login-form" id="form-login" novalidate>
         <div class="form-group">
-          <label class="form-label" for="admin-password">Password</label>
-          <div class="input-wrapper">
-            <input id="admin-password" type="password" class="form-input" placeholder="Masukkan password admin" required />
-            <button type="button" class="input-toggle" id="toggle-password">
-              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
+          <label class="form-label" style="color:rgba(255,255,255,0.7);font-size:14px;">Password</label>
+          <input id="admin-password" type="password" class="form-input" placeholder="Masukkan password admin" required />
         </div>
         <div id="login-error"><span>❌ Password salah. Silakan coba lagi.</span></div>
-        <button type="submit" id="btn-login" class="btn btn-secondary btn-full btn-lg">Masuk ke Panel</button>
+        <button type="submit" id="btn-login" class="btn btn-secondary btn-full btn-lg" style="width:100%;padding:12px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:bold;">Masuk ke Panel</button>
       </form>
     </div>
   </div>
@@ -264,7 +82,10 @@
     <nav class="admin-navbar">
       <a class="navbar-brand" href="#">
         <div class="navbar-brand-icon">🏸</div>
-        <div><div class="navbar-brand-text">Badminton</div><div class="navbar-brand-sub">Admin Panel</div></div>
+        <div>
+          <div style="font-weight:600;">Badminton</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.45);">Admin Panel</div>
+        </div>
       </a>
       <div class="navbar-nav">
         <button class="nav-link active" id="nav-dashboard">Dashboard</button>
@@ -274,140 +95,87 @@
         <button class="nav-link" id="nav-settings">Pengaturan</button>
       </div>
       <div class="navbar-right">
-        <span id="admin-greeting-text" style="color: var(--white); font-size: var(--text-sm);">Halo, Admin</span>
+        <span id="admin-greeting-text" style="color: var(--white); font-size: 13px;">Halo, Admin</span>
         <button class="navbar-logout" id="btn-logout">Logout</button>
-        <button class="navbar-hamburger" id="btn-hamburger"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></button>
       </div>
     </nav>
-
-    <!-- Mobile Drawer -->
-    <div class="mobile-drawer-overlay" id="drawer-overlay"></div>
-    <div class="mobile-drawer" id="mobile-drawer">
-      <div class="drawer-header"><span class="drawer-title">🏸 Badminton Admin</span><button class="drawer-close" id="btn-drawer-close">✕</button></div>
-      <button class="drawer-nav-link active" data-drawer-nav="dashboard">Dashboard</button>
-      <button class="drawer-nav-link" data-drawer-nav="log">Log Data</button>
-      <button class="drawer-nav-link" data-drawer-nav="qr">Cetak QR</button>
-      <button class="drawer-nav-link" data-drawer-nav="admin-mgmt" id="drawer-nav-admin-mgmt" style="display: none;">Manajemen Admin</button>
-      <button class="drawer-nav-link" data-drawer-nav="settings">Pengaturan</button>
-      <div class="drawer-logout"><button class="drawer-nav-link" id="btn-drawer-logout" style="color:#FCA5A5;">Logout</button></div>
-    </div>
 
     <div class="admin-content">
       <!-- DASHBOARD PANEL -->
       <div class="admin-panel active" id="panel-dashboard">
         <div class="admin-page-header">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);">
-            <div><h1 class="page-title">Dashboard Operasional</h1><p class="page-subtitle">Ringkasan aktivitas lapangan hari ini</p></div>
-            <div class="page-date" id="current-date-display">—</div>
-          </div>
+          <div><h1 class="page-title">Dashboard Operasional</h1><p class="page-subtitle">Ringkasan aktivitas lapangan hari ini</p></div>
+          <div id="current-date-display" style="color:var(--gray-500);font-size:14px;">—</div>
         </div>
         <div class="content-area">
-          <div class="summary-cards">
-            <div class="summary-card"><div class="card-icon gray">📋</div><div class="card-value" id="metric-total-sessions">—</div><div class="card-label">Total Sesi Hari Ini</div><div class="card-trend" id="trend-sessions"></div></div>
-            <div class="summary-card"><div class="card-icon maroon">⚡</div><div class="card-value" id="metric-active-sessions" style="color:var(--maroon-700);">—</div><div class="card-label">Sesi Aktif (Live)</div><div class="card-trend" style="color:var(--maroon-700);" id="trend-active"></div></div>
-            <div class="summary-card"><div class="card-icon green">👥</div><div class="card-value" id="metric-total-players" style="color:var(--primary-600);">—</div><div class="card-label">Total Pemain Hadir</div></div>
-            <div class="summary-card"><div class="card-icon blue">🏸</div><div class="card-value" id="metric-shuttlecock" style="color:var(--color-info);">—</div><div class="card-label">Shuttlecock Terpakai</div></div>
-          </div>
-          <div class="live-courts-section">
-            <div class="section-header"><h2 class="section-title"><span class="live-dot" style="margin-right:8px;"></span>Lapangan Aktif Saat Ini</h2><button class="btn-refresh" id="btn-refresh-dashboard">Refresh</button></div>
-            <div style="overflow-x:auto;">
-              <table class="live-table">
-                <thead><tr><th>Lapangan</th><th>PIC</th><th>Check-in</th><th>Durasi</th><th>ID Transaksi</th></tr></thead>
-                <tbody id="live-courts-body"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🏟️</div><p>Tidak ada lapangan aktif saat ini</p></div></td></tr></tbody>
-              </table>
-            </div>
-          </div>
+          <p style="color:var(--gray-600);">Selamat datang di Panel Utama BadmintonKuy.</p>
         </div>
       </div>
 
       <!-- LOG PANEL -->
       <div class="admin-panel" id="panel-log">
-        <div class="admin-page-header"><h1 class="page-title">Log Adjustment</h1><p class="page-subtitle">Riwayat & manajemen data transaksi</p></div>
-        <div class="content-area">
-          <div class="log-toolbar">
-            <div class="search-wrapper"><input type="search" id="search-log" class="search-input" placeholder="Cari nama, lapangan, ID..." /></div>
-            <select id="filter-status" class="filter-select"><option value="">Semua Status</option><option value="Active">Aktif</option><option value="Completed">Selesai</option></select>
-            <select id="filter-court" class="filter-select"><option value="">Semua Lapangan</option></select>
-          </div>
-          <div class="table-container">
-            <div style="overflow-x:auto;">
-              <table class="data-table" id="log-table">
-                <thead><tr><th>#</th><th>ID Transaksi</th><th>Court</th><th>PIC</th><th>Check-in</th><th>Check-out</th><th>Anggota</th><th>Shuttlecock</th><th>Status</th><th>Aksi</th></tr></thead>
-                <tbody id="log-table-body"></tbody>
-              </table>
-            </div>
-            <div class="table-footer"><span class="table-info" id="table-info">—</span><div class="pagination" id="pagination"></div></div>
-          </div>
-        </div>
+        <div class="admin-page-header"><div><h1 class="page-title">Log Adjustment</h1><p class="page-subtitle">Riwayat data transaksi</p></div></div>
+        <div class="content-area"><div class="table-container"><table class="data-table"><tbody id="log-table-body"></tbody></table></div></div>
       </div>
 
-      <!-- QR PANEL -->
+      <!-- QR PANEL (DENGAN MODAL) -->
       <div class="admin-panel" id="panel-qr">
-        <div class="admin-page-header"><h1 class="page-title">Cetak QR Code Lapangan</h1><p class="page-subtitle">Buat dan cetak QR Code untuk dipasang pada papan lapangan</p></div>
+        <div class="admin-page-header">
+          <div><h1 class="page-title">Direktori QR Code Lapangan</h1><p class="page-subtitle">Kelola dan unduh ulang QR Code lapangan terdaftar</p></div>
+          <button class="btn btn-secondary" id="btn-open-modal-qr" style="background:#991B1B;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;">+ Daftar QR Code Baru</button>
+        </div>
         <div class="content-area">
-          <div class="card qr-controls" style="max-width: 500px; margin-bottom: var(--space-6);">
-            <div class="form-group">
-              <label class="form-label" for="qr-court-id">ID / Nama Lapangan</label>
-              <div style="display:flex; gap:10px;"><input type="text" id="qr-court-id" class="form-input admin-form" placeholder="Contoh: COURT-A" /><button id="btn-generate-qr" class="btn btn-secondary">Buat QR</button></div>
-            </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr><th>ID QR</th><th>Nama Lapangan</th><th>Tanggal Dibuat</th><th>Aksi Cetak</th></tr>
+              </thead>
+              <tbody id="qr-list-body">
+                <tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--gray-500);">Memuat data QR...</td></tr>
+              </tbody>
+            </table>
           </div>
-          <div id="print-section" style="display:none; background: var(--white); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-1); max-width: 400px; text-align: center;">
-            <h2 id="print-court-name" style="font-size: 32px; font-weight: var(--fw-bold); margin-bottom: var(--space-4);">—</h2>
-            <div id="qrcode-display" style="display: flex; justify-content: center; margin-bottom: var(--space-5);"></div>
-            <p style="color: var(--gray-600); font-size: 14px; margin-bottom: var(--space-6);">Scan QR Code ini untuk Check-in / Check-out</p>
-            <button id="btn-print-qr" class="btn btn-primary btn-full qr-controls" style="max-width: 200px; margin: 0 auto;">Cetak Sekarang</button>
+
+          <!-- Pratinjau Cetak QR -->
+          <div id="print-section" style="display:none; background: var(--white); padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-1); max-width: 400px; text-align: center; margin: 24px auto 0;">
+            <h2 id="print-court-name" style="font-size: 28px; font-weight: bold; margin-bottom: 16px;">—</h2>
+            <div id="qrcode-display" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
+            <p style="color: var(--gray-600); font-size: 13px; margin-bottom: 20px;">Scan untuk Check-in / Check-out</p>
+            <div style="display: flex; gap: 10px;">
+              <button onclick="document.getElementById('print-section').style.display='none'" class="btn" style="flex:1;padding:8px;background:#e5e7eb;border:none;border-radius:4px;cursor:pointer;">Tutup</button>
+              <button onclick="window.print()" class="btn" style="flex:1;padding:8px;background:#991B1B;color:#fff;border:none;border-radius:4px;cursor:pointer;">Cetak Sekarang</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- MANAJEMEN ADMIN PANEL -->
+      <!-- MANAJEMEN ADMIN PANEL (DENGAN MODAL) -->
       <div class="admin-panel" id="panel-admin-mgmt">
-        <div class="admin-page-header"><h1 class="page-title">Manajemen Admin</h1><p class="page-subtitle">Kelola akun admin dan hak akses sistem</p></div>
+        <div class="admin-page-header">
+          <div><h1 class="page-title">Manajemen Admin</h1><p class="page-subtitle">Kelola akun admin dan hak akses sistem</p></div>
+          <button class="btn btn-secondary" id="btn-open-modal-admin" style="background:#991B1B;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;">+ Tambah Akun Admin Baru</button>
+        </div>
         <div class="content-area">
-          <div class="card" style="max-width: 600px; margin-bottom: var(--space-6);">
-            <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-4);">Tambah Admin Baru</h3>
-            <form id="form-add-admin" style="display: flex; flex-direction: column; gap: var(--space-4);" novalidate>
-              <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" id="new-admin-name" class="form-input admin-form" required placeholder="Contoh: Budi Santoso" /></div>
-              <div class="form-group"><label class="form-label">Password</label><input type="password" id="new-admin-pwd" class="form-input admin-form" required placeholder="Minimal 5 karakter" /></div>
-              <div class="form-group"><label class="form-label">Telegram Chat ID (Opsional untuk notifikasi)</label><input type="text" id="new-admin-chatid" class="form-input admin-form" placeholder="Contoh: 6808739491" /></div>
-              <div class="form-group">
-                <label class="form-label">Role / Hak Akses</label>
-                <select id="new-admin-role" class="form-input filter-select" style="height:48px;">
-                  <option value="Admin Biasa">Admin Biasa (Monitoring & Log)</option>
-                  <option value="Administrator">Administrator (Akses Penuh)</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-secondary btn-full" id="btn-submit-admin">Tambah Akun Admin</button>
-            </form>
-          </div>
           <div class="table-container">
-            <div class="section-header"><h2 class="section-title">Daftar Akun Terdaftar</h2><button class="btn-refresh" id="btn-refresh-admins">Refresh</button></div>
-            <div style="overflow-x:auto;">
-              <table class="data-table">
-                <thead><tr><th>ID Admin</th><th>Nama</th><th>Role</th><th>Telegram Chat ID</th><th>Aksi</th></tr></thead>
-                <tbody id="admin-list-body"></tbody>
-              </table>
-            </div>
+            <table class="data-table">
+              <thead>
+                <tr><th>ID Admin</th><th>Nama</th><th>Role</th><th>Telegram Chat ID</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="admin-list-body"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
       <!-- SETTINGS PANEL -->
       <div class="admin-panel" id="panel-settings">
-        <div class="admin-page-header"><h1 class="page-title">Pengaturan Akun</h1><p class="page-subtitle">Ubah nama admin dan password panel</p></div>
+        <div class="admin-page-header"><div><h1 class="page-title">Pengaturan Akun</h1><p class="page-subtitle">Ubah nama admin dan password panel</p></div></div>
         <div class="content-area">
-          <div class="card" style="max-width: 500px; padding: var(--space-6);">
-            <form id="form-settings" style="display: flex; flex-direction: column; gap: var(--space-4);" novalidate>
-              <div class="form-group"><label class="form-label">Nama Admin</label><input type="text" id="setting-name" class="form-input admin-form" required /></div>
-              <div class="form-group">
-                <label class="form-label">Password Baru</label>
-                <div class="input-wrapper">
-                  <input type="password" id="setting-password" class="form-input admin-form" placeholder="Ketik password baru" />
-                  <button type="button" class="input-toggle" id="toggle-setting-pwd">👁</button>
-                </div>
-                <span class="form-hint">Kosongkan jika tidak ingin mengubah password.</span>
-              </div>
-              <button type="submit" class="btn btn-secondary btn-full">Simpan Pengaturan</button>
+          <div class="card" style="max-width: 500px; padding: 24px; background:#fff; border-radius:8px; box-shadow:var(--shadow-1);">
+            <form id="form-settings" style="display: flex; flex-direction: column; gap: 16px;" novalidate>
+              <div><label style="font-size:13px;font-weight:600;">Nama Admin</label><input type="text" id="setting-name" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" required /></div>
+              <div><label style="font-size:13px;font-weight:600;">Password Baru</label><input type="password" id="setting-password" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" placeholder="Kosongkan jika tetap" /></div>
+              <button type="submit" style="padding:10px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Simpan Pengaturan</button>
             </form>
           </div>
         </div>
@@ -415,51 +183,45 @@
     </div>
   </div>
 
-  <!-- MODALS -->
-  <div class="modal-backdrop" id="modal-edit">
+  <!-- MODAL: TAMBAH QR BARU -->
+  <div class="modal-backdrop" id="modal-qr">
     <div class="modal-box">
-      <div class="modal-header"><div><h2 class="modal-title">Edit Data Transaksi</h2><p id="modal-edit-subtitle" style="font-size:var(--text-sm);color:var(--gray-500);">—</p></div><button class="modal-close" id="btn-close-edit">✕</button></div>
-      <div class="modal-body">
-        <input type="hidden" id="edit-txn-id" /><input type="hidden" id="edit-row-index" />
-        <div class="form-group"><label class="form-label">Nama PIC</label><input type="text" id="edit-pic-name" class="form-input admin-form" /></div>
-        <div class="form-group"><label class="form-label">Waktu Check-in</label><input type="datetime-local" id="edit-checkin" class="form-input admin-form" /></div>
-        <div class="form-group"><label class="form-label">Waktu Check-out</label><input type="datetime-local" id="edit-checkout" class="form-input admin-form" /></div>
-        <div class="form-group"><label class="form-label">Status</label><select id="edit-status" class="form-input filter-select" style="height:48px;"><option value="Active">Active</option><option value="Completed">Completed</option></select></div>
-      </div>
-      <div class="modal-footer"><button class="btn btn-outline btn-md" id="btn-cancel-edit">Batal</button><button class="btn btn-secondary btn-md" id="btn-save-edit">Simpan Perubahan</button></div>
+      <div class="modal-header"><h3>Daftarkan Lapangan / QR Baru</h3><button class="modal-close" id="btn-close-modal-qr">✕</button></div>
+      <form id="form-add-qr" style="display:flex; flex-direction:column; gap:14px;">
+        <div><label style="font-size:13px;font-weight:600;">Nama / ID Lapangan</label><input type="text" id="new-court-name" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" placeholder="Contoh: COURT-A" required /></div>
+        <button type="submit" id="btn-submit-qr" style="padding:10px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Simpan & Buat QR</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH ADMIN BARU -->
+  <div class="modal-backdrop" id="modal-admin">
+    <div class="modal-box">
+      <div class="modal-header"><h3>Tambah Akun Admin Baru</h3><button class="modal-close" id="btn-close-modal-admin">✕</button></div>
+      <form id="form-add-admin" style="display:flex; flex-direction:column; gap:14px;">
+        <div><label style="font-size:13px;font-weight:600;">Nama Lengkap</label><input type="text" id="new-admin-name" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" required /></div>
+        <div><label style="font-size:13px;font-weight:600;">Password</label><input type="password" id="new-admin-pwd" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" required /></div>
+        <div><label style="font-size:13px;font-weight:600;">Telegram Chat ID</label><input type="text" id="new-admin-chatid" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" placeholder="Contoh: 6808739491" /></div>
+        <div>
+          <label style="font-size:13px;font-weight:600;">Role / Hak Akses</label>
+          <select id="new-admin-role" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;height:42px;">
+            <option value="Admin Biasa">Admin Biasa</option>
+            <option value="Administrator">Administrator</option>
+          </select>
+        </div>
+        <button type="submit" id="btn-submit-admin" style="padding:10px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Simpan Admin</button>
+      </form>
     </div>
   </div>
 
   <!-- JAVASCRIPT -->
   <script>
     'use strict';
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI_nrI6IsdoB61ilcg8ho9IO5ehtBcbX33IiJYa4Wufw7TrWqUmm5VKu7VnwZNmIgx/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI_nrI6IsdoB61ilcg8ho9IO5ehtBcbX33IiJYa4Wufw7TrWqUmm5VKu7VnwZNmIgx/exec'; // Masukkan URL Web App Google Apps Script Anda
     const LS_ADMIN_KEY = 'badminton_admin_auth';
-    const PAGE_SIZE = 10;
-
-    let allData = [];
-    let filteredData = [];
-    let currentPage = 1;
-    let sortKey = 'checkIn';
-    let sortDir = 'desc';
-    let liveTimers = {};
-
     let currentAdminRole = sessionStorage.getItem('admin_role') || 'Admin Biasa';
     let currentAdminName = sessionStorage.getItem('admin_name') || 'Admin';
 
-    function showToast(message, type = 'success', duration = 4000) {
-      const container = document.getElementById('toast-container');
-      const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${message}</span>`;
-      container.appendChild(toast);
-      const dismiss = () => { toast.classList.add('toast-out'); setTimeout(() => toast.remove(), 300); };
-      toast.addEventListener('click', dismiss);
-      setTimeout(dismiss, duration);
-    }
-
-    // Auth Session check
     if (sessionStorage.getItem(LS_ADMIN_KEY) === 'true') {
       document.getElementById('screen-login').classList.remove('active');
       document.getElementById('admin-layout').classList.add('active');
@@ -468,36 +230,24 @@
     }
 
     function applyRolePermissions() {
-      const adminMgmtNav = document.getElementById('nav-admin-mgmt');
-      const drawerAdminMgmt = document.getElementById('drawer-nav-admin-mgmt');
       if (currentAdminRole === 'Administrator') {
-        if (adminMgmtNav) adminMgmtNav.style.display = 'flex';
-        if (drawerAdminMgmt) drawerAdminMgmt.style.display = 'flex';
-      } else {
-        if (adminMgmtNav) adminMgmtNav.style.display = 'none';
-        if (drawerAdminMgmt) drawerAdminMgmt.style.display = 'none';
+        document.getElementById('nav-admin-mgmt').style.display = 'block';
       }
       document.getElementById('admin-greeting-text').textContent = `Halo, ${currentAdminName} (${currentAdminRole})`;
       document.getElementById('setting-name').value = currentAdminName;
     }
 
-    // Login Form Handler (Fetch dinamis ke tab Data_Admin)
+    // Login Form Handler
     document.getElementById('form-login').addEventListener('submit', async function (e) {
       e.preventDefault();
       const password = document.getElementById('admin-password').value;
-      const btn = document.getElementById('btn-login');
       const errorEl = document.getElementById('login-error');
-
-      btn.disabled = true;
-      btn.innerHTML = 'Memverifikasi...';
       errorEl.classList.remove('visible');
 
       try {
         const res = await fetch(`${GAS_URL}?action=get_admins`, { redirect: 'follow' });
         const json = await res.json();
         const admins = json.data || [];
-
-        // Fallback jika sheet kosong/belum terinisialisasi
         let matchedAdmin = admins.find(a => String(a.password) === String(password));
 
         if (matchedAdmin) {
@@ -511,43 +261,30 @@
           document.getElementById('admin-layout').classList.add('active');
           applyRolePermissions();
           initDashboard();
-          showToast(`Selamat datang, ${matchedAdmin.namaAdmin}! 🎉`, 'success');
         } else {
           errorEl.classList.add('visible');
           document.getElementById('admin-password').value = '';
         }
       } catch (err) {
-      errorEl.classList.add('visible');
-      document.getElementById('admin-password').value = '';
-    }
-    
-      btn.disabled = false;
-      btn.innerHTML = 'Masuk ke Panel';
+        errorEl.classList.add('visible');
+      }
     });
 
-    function doLogout() {
+    document.getElementById('btn-logout').addEventListener('click', () => {
       sessionStorage.clear();
       location.reload();
-    }
-    document.getElementById('btn-logout').addEventListener('click', doLogout);
-    document.getElementById('btn-drawer-logout').addEventListener('click', doLogout);
+    });
 
-    // Navigation Switches
+    // Switch Panel
     function switchPanel(name) {
-      if (name === 'admin-mgmt' && currentAdminRole !== 'Administrator') {
-        showToast('Akses ditolak. Khusus Administrator.', 'error');
-        return;
-      }
+      if (name === 'admin-mgmt' && currentAdminRole !== 'Administrator') return;
       document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-      
-      const panel = document.getElementById(`panel-${name}`);
-      const navBtn = document.getElementById(`nav-${name}`);
-      if (panel) panel.classList.add('active');
-      if (navBtn) navBtn.classList.add('active');
+      document.getElementById(`panel-${name}`).classList.add('active');
+      document.getElementById(`nav-${name}`).classList.add('active');
 
-      if (name === 'log') { fetchAndRenderLog(); }
-      if (name === 'admin-mgmt') { fetchAndRenderAdmins(); }
+      if (name === 'qr') fetchAndRenderQRList();
+      if (name === 'admin-mgmt') fetchAndRenderAdmins();
     }
 
     document.getElementById('nav-dashboard').addEventListener('click', () => switchPanel('dashboard'));
@@ -556,198 +293,108 @@
     document.getElementById('nav-admin-mgmt').addEventListener('click', () => switchPanel('admin-mgmt'));
     document.getElementById('nav-settings').addEventListener('click', () => switchPanel('settings'));
 
-    // Drawer navigation
-    document.querySelectorAll('[data-drawer-nav]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchPanel(btn.dataset.drawerNav);
-        document.getElementById('drawer-overlay').classList.remove('active');
-        document.getElementById('mobile-drawer').classList.remove('active');
-      });
-    });
+    // Modal Handlers (QR)
+    document.getElementById('btn-open-modal-qr').addEventListener('click', () => document.getElementById('modal-qr').classList.add('active'));
+    document.getElementById('btn-close-modal-qr').addEventListener('click', () => document.getElementById('modal-qr').classList.remove('active'));
 
-    document.getElementById('btn-hamburger').addEventListener('click', () => {
-      document.getElementById('drawer-overlay').classList.add('active');
-      document.getElementById('mobile-drawer').classList.add('active');
-    });
-    document.getElementById('btn-drawer-close').addEventListener('click', () => {
-      document.getElementById('drawer-overlay').classList.remove('active');
-      document.getElementById('mobile-drawer').classList.remove('active');
-    });
+    // Modal Handlers (Admin)
+    document.getElementById('btn-open-modal-admin').addEventListener('click', () => document.getElementById('modal-admin').classList.add('active'));
+    document.getElementById('btn-close-modal-admin').addEventListener('click', () => document.getElementById('modal-admin').classList.remove('active'));
 
-    async function fetchData() {
+    // Fetch & Render QR List
+    async function fetchAndRenderQRList() {
+      const tbody = document.getElementById('qr-list-body');
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px;">Memuat data...</td></tr>`;
       try {
-        const res = await fetch(GAS_URL, { redirect: 'follow' });
+        const res = await fetch(`${GAS_URL}?action=get_qrs`, { redirect: 'follow' });
         const json = await res.json();
-        return json.data || [];
+        const qrs = json.data || [];
+        if (qrs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--gray-500);">Belum ada QR terdaftar</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = qrs.map(q => `
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">${q.idQr}</td>
+            <td><strong>${q.courtName}</strong></td>
+            <td>${new Date(Number(q.createdAt)).toLocaleDateString('id-ID')}</td>
+            <td><button class="action-btn" onclick="previewQR('${q.courtName}')" title="Cetak QR">🖨️</button></td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Gagal memuat data QR</td></tr>`;
+      }
+    }
+
+    window.previewQR = function(courtName) {
+      const container = document.getElementById('qrcode-display');
+      container.innerHTML = '';
+      document.getElementById('print-court-name').textContent = courtName;
+      new QRCode(container, { text: courtName, width: 220, height: 220 });
+      document.getElementById('print-section').style.display = 'block';
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    };
+
+    // Submit QR Baru
+    document.getElementById('form-add-qr').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-court-name').value.trim();
+      if (!name) return;
+      try {
+        const fd = new URLSearchParams({ action: 'add_qr', court_name: name });
+        await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+        document.getElementById('modal-qr').classList.remove('active');
+        document.getElementById('new-court-name').value = '';
+        fetchAndRenderQRList();
       } catch (err) {
-        showToast('Gagal memuat data dari server.', 'warning');
-        return [];
+        alert('Gagal menyimpan QR');
       }
-    }
-
-    async function initDashboard() {
-      const now = new Date();
-      document.getElementById('current-date-display').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      allData = await fetchData();
-      filteredData = [...allData];
-      updateSummaryCards();
-      updateLiveCourts();
-    }
-
-    function updateSummaryCards() {
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      const todayTs = today.getTime();
-      const todayData = allData.filter(d => d.checkIn >= todayTs);
-      
-      document.getElementById('metric-total-sessions').textContent = todayData.length;
-      document.getElementById('metric-active-sessions').textContent = todayData.filter(d => d.status === 'Active').length;
-      document.getElementById('metric-total-players').textContent = todayData.filter(d => d.members).reduce((s, d) => s + (d.members || 0), 0);
-      document.getElementById('metric-shuttlecock').textContent = todayData.filter(d => d.shuttle != null).reduce((s, d) => s + (d.shuttle || 0), 0);
-    }
-
-    function updateLiveCourts() {
-      const activeSessions = allData.filter(d => d.status === 'Active');
-      const tbody = document.getElementById('live-courts-body');
-      if (activeSessions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🏟️</div><p>Tidak ada lapangan aktif saat ini</p></div></td></tr>`;
-        return;
-      }
-      tbody.innerHTML = activeSessions.map(s => `
-        <tr>
-          <td><span class="court-live-badge"><span class="live-dot" style="background:#991B1B;"></span>${s.courtId}</span></td>
-          <td><strong>${s.picName}</strong></td>
-          <td>${new Date(s.checkIn).toLocaleTimeString('id-ID')} WIB</td>
-          <td class="live-duration">Live</td>
-          <td><span class="txn-id">${s.txnId}</span></td>
-        </tr>
-      `).join('');
-    }
-
-    document.getElementById('btn-refresh-dashboard').addEventListener('click', async function() {
-      this.classList.add('spinning');
-      allData = await fetchData();
-      updateSummaryCards();
-      updateLiveCourts();
-      setTimeout(() => this.classList.remove('spinning'), 800);
-      showToast('Dashboard diperbarui', 'success');
     });
 
-    async function fetchAndRenderLog() {
-      document.getElementById('table-info').textContent = 'Memuat data...';
-      allData = await fetchData();
-      filteredData = [...allData];
-      renderLogTable();
-    }
-
-    function renderLogTable() {
-      const tbody = document.getElementById('log-table-body');
-      const total = filteredData.length;
-      const start = (currentPage - 1) * PAGE_SIZE;
-      const end = Math.min(start + PAGE_SIZE, total);
-      const page = filteredData.slice(start, end);
-
-      if (page.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><p>Tidak ada data</p></div></td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = page.map((d, i) => `
-        <tr>
-          <td>${start + i + 1}</td>
-          <td><span class="txn-id">${d.txnId}</span></td>
-          <td><strong>${d.courtId}</strong></td>
-          <td>${d.picName}</td>
-          <td>${new Date(d.checkIn).toLocaleTimeString('id-ID')}</td>
-          <td>${d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID') : '—'}</td>
-          <td>${d.members ?? '—'}</td>
-          <td>${d.shuttle ?? '—'}</td>
-          <td><span class="status-badge ${d.status === 'Active' ? 'status-active' : 'status-completed'}">${d.status}</span></td>
-          <td>
-            <button class="action-btn edit" onclick="openEditModal('${d.txnId}')">✏️</button>
-            <button class="action-btn delete" onclick="deleteTxn('${d.txnId}')">🗑️</button>
-          </td>
-        </tr>
-      `).join('');
-      document.getElementById('table-info').textContent = `Menampilkan ${start + 1}–${end} dari ${total} entri`;
-    }
-
-    // Manajemen Admin Table Renderer & Form Handler
+    // Fetch & Render Admin List
     async function fetchAndRenderAdmins() {
       const tbody = document.getElementById('admin-list-body');
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Memuat data admin...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Memuat admin...</td></tr>`;
       try {
         const res = await fetch(`${GAS_URL}?action=get_admins`, { redirect: 'follow' });
         const json = await res.json();
         const admins = json.data || [];
-
         tbody.innerHTML = admins.map(a => `
           <tr>
-            <td><span class="txn-id">${a.idAdmin}</span></td>
+            <td>${a.idAdmin}</td>
             <td><strong>${a.namaAdmin}</strong></td>
-            <td><span class="status-badge ${a.role === 'Administrator' ? 'status-active' : 'status-completed'}">${a.role}</span></td>
+            <td>${a.role}</td>
             <td>${a.telegramChatId || '—'}</td>
-            <td>${a.idAdmin !== 'ADM-001' ? `<button class="action-btn delete" onclick="deleteAdmin('${a.idAdmin}')">🗑️</button>` : 'System Default'}</td>
+            <td>${a.idAdmin !== 'ADM-001' ? `<button class="action-btn delete" onclick="deleteAdmin('${a.idAdmin}')">🗑️</button>` : 'Default'}</td>
           </tr>
         `).join('');
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Gagal memuat daftar admin</td></tr>`;
-      }
+      } catch (e) {}
     }
 
+    // Submit Admin Baru
     document.getElementById('form-add-admin').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const nama = document.getElementById('new-admin-name').value.trim();
+      const nama = document.getElementById('new-admin-name').value;
       const pwd = document.getElementById('new-admin-pwd').value;
-      const chatId = document.getElementById('new-admin-chatid').value.trim();
+      const chatId = document.getElementById('new-admin-chatid').value;
       const role = document.getElementById('new-admin-role').value;
-
-      if (!nama || !pwd) { showToast('Nama dan password wajib diisi', 'error'); return; }
-
-      const btn = document.getElementById('btn-submit-admin');
-      btn.disabled = true;
-      btn.innerHTML = 'Menambahkan...';
-
       try {
         const fd = new URLSearchParams({ action: 'add_admin', nama_admin: nama, password: pwd, role: role, telegram_chat_id: chatId });
         await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
-        showToast('Admin baru berhasil ditambahkan!', 'success');
+        document.getElementById('modal-admin').classList.remove('active');
         document.getElementById('form-add-admin').reset();
         fetchAndRenderAdmins();
-      } catch (err) {
-        showToast('Gagal menambahkan admin', 'error');
-      }
-      btn.disabled = false;
-      btn.innerHTML = 'Tambah Akun Admin';
+      } catch (err) {}
     });
 
-    window.deleteAdmin = async function(idAdmin) {
-      if (!confirm('Yakin ingin menghapus akses admin ini?')) return;
-      try {
-        const fd = new URLSearchParams({ action: 'delete_admin', id_admin: idAdmin });
-        await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
-        showToast('Admin berhasil dihapus', 'info');
-        fetchAndRenderAdmins();
-      } catch (err) {
-        showToast('Gagal menghapus admin', 'error');
-      }
+    window.deleteAdmin = async function(id) {
+      if (!confirm('Hapus admin ini?')) return;
+      const fd = new URLSearchParams({ action: 'delete_admin', id_admin: id });
+      await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+      fetchAndRenderAdmins();
     };
 
-    // QR Code Generator
-    document.getElementById('nav-qr').addEventListener('click', () => switchPanel('qr'));
-    document.getElementById('btn-generate-qr').addEventListener('click', () => {
-      const courtId = document.getElementById('qr-court-id').value.trim().toUpperCase();
-      if (!courtId) { showToast('ID Lapangan kosong', 'error'); return; }
-      const container = document.getElementById('qrcode-display');
-      container.innerHTML = '';
-      document.getElementById('print-court-name').textContent = courtId;
-      new QRCode(container, { text: courtId, width: 240, height: 240 });
-      document.getElementById('print-section').style.display = 'block';
-    });
-    document.getElementById('btn-print-qr').addEventListener('click', () => window.print());
-
-    if (sessionStorage.getItem(LS_ADMIN_KEY) === 'true') {
-      initDashboard();
-    }
+    function initDashboard() {}
   </script>
 </body>
 </html>
