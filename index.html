@@ -80,13 +80,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-5);
+      gap: var(--space-6);
+      /* Diperbesar dari space-5 ke space-6 agar lebih lega */
       flex: 1;
+      justify-content: center;
+      /* Membuat konten hero pas di tengah vertikal */
     }
 
     .logo-icon {
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      /* Diperbesar agar lebih proporsional */
+      height: 110px;
       background: var(--primary-50);
       border-radius: 50%;
       display: flex;
@@ -97,8 +101,9 @@
     }
 
     .logo-icon svg {
-      width: 56px;
-      height: 56px;
+      width: 64px;
+      /* Ikon svg di dalam diperbesar */
+      height: 64px;
     }
 
     .landing-title {
@@ -613,55 +618,54 @@
         </div>
 
         <div>
-          <h1 class="landing-title">BadmintonKuy<br />by Muz</h1
+          <h1 class="landing-title">BadmintonKuy<br />by Muz</h1 </div>
+
+          <p class="landing-subtitle text-muted">
+            Scan QR Code lapangan untuk memulai atau melanjutkan sesi Anda
+          </p>
         </div>
 
-        <p class="landing-subtitle text-muted">
-          Scan QR Code lapangan untuk memulai atau melanjutkan sesi Anda
-        </p>
-      </div>
-
-      <div class="landing-actions">
-        <!-- Active session banner -->
-        <div id="active-session-banner" role="button" tabindex="0" aria-label="Lanjutkan sesi aktif">
-          <span class="banner-icon">⚡</span>
-          <div class="banner-text">
-            <strong>Sesi Aktif Ditemukan!</strong>
-            <span id="banner-session-info">Ketuk untuk melanjutkan</span>
+        <div class="landing-actions">
+          <!-- Active session banner -->
+          <div id="active-session-banner" role="button" tabindex="0" aria-label="Lanjutkan sesi aktif">
+            <span class="banner-icon">⚡</span>
+            <div class="banner-text">
+              <strong>Sesi Aktif Ditemukan!</strong>
+              <span id="banner-session-info">Ketuk untuk melanjutkan</span>
+            </div>
+            <span>→</span>
           </div>
-          <span>→</span>
+
+          <button id="btn-scan" class="btn btn-primary btn-full btn-lg" aria-label="Scan QR Code lapangan">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 3h5v5H3z" />
+              <path d="M3 11h2v2H3z" />
+              <path d="M3 16h5v5H3z" />
+              <path d="M11 3h2v2h-2z" />
+              <path d="M11 8h2v5h-2z" />
+              <path d="M16 3h5v5h-5z" />
+              <path d="M16 11h5v5h-5z" />
+              <path d="M11 16h2v5h-2z" />
+              <path d="M16 18h3v3h-3z" />
+            </svg>
+            Scan Lapangan
+          </button>
+
+          <a href="admin.html" class="btn btn-ghost btn-full" aria-label="Pergi ke halaman admin">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+            Admin Panel
+          </a>
         </div>
-
-        <button id="btn-scan" class="btn btn-primary btn-full btn-lg" aria-label="Scan QR Code lapangan">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 3h5v5H3z" />
-            <path d="M3 11h2v2H3z" />
-            <path d="M3 16h5v5H3z" />
-            <path d="M11 3h2v2h-2z" />
-            <path d="M11 8h2v5h-2z" />
-            <path d="M16 3h5v5h-5z" />
-            <path d="M16 11h5v5h-5z" />
-            <path d="M11 16h2v5h-2z" />
-            <path d="M16 18h3v3h-3z" />
-          </svg>
-          Scan Lapangan
-        </button>
-
-        <a href="admin.html" class="btn btn-ghost btn-full" aria-label="Pergi ke halaman admin">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            aria-hidden="true">
-            <rect x="3" y="11" width="18" height="11" rx="2" />
-            <path d="M7 11V7a5 5 0 0110 0v4" />
-          </svg>
-          Admin Panel
-        </a>
-      </div>
-      <div class="card-footer-inline">
-       <div class="footer-divider"></div>
-       <p class="footer-brand">🏸 BadmintonKuy - By Muz</p>
-       <p class="footer-text">&copy; 2026 Muhammad Muzany Mulyoutomo. All rights reserved.</p>
-    </div>
+        <div class="card-footer-inline">
+          <div class="footer-divider"></div>
+          <p class="footer-brand">🏸 BadmintonKuy - By Muz</p>
+          <p class="footer-text">&copy; 2026 Muhammad Muzany Mulyoutomo. All rights reserved.</p>
+        </div>
     </section>
 
     <!-- ╔═══════════════════════════════════════════════════════
