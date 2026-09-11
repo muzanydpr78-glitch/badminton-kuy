@@ -739,21 +739,19 @@
       container.innerHTML = '';
       document.getElementById('print-court-name').textContent = courtName;
       
-      // Berikan jeda sekejap agar elemen tampil di DOM sebelum library QR merender
-      setTimeout(() => {
-        new QRCode(container, { 
-          text: courtName, 
-          width: 200, 
-          height: 200,
-          colorDark : "#1e293b",
-          colorLight : "#ffffff",
-          correctLevel : QRCode.CorrectLevel.H
-        });
-      }, 50);
+      // Render QR Code dengan opsi render 'image' agar bisa dibaca html2canvas
+      new QRCode(container, { 
+        text: courtName, 
+        width: 200, 
+        height: 200,
+        colorDark : "#1e293b",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H,
+        useSVG: true
+      });
 
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
-    
     // Download Kartu QR sebagai JPG menggunakan html2canvas dengan jeda render
     document.getElementById('btn-download-jpg').addEventListener('click', function() {
       const printSection = document.getElementById('print-section');
