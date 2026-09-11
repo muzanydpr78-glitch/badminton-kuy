@@ -154,14 +154,23 @@
 
     /* CSS Khusus Cetak PDF (Clean Print Layout) */
     @media print {
-      body * { visibility: hidden; }
-      #print-card-template, #print-card-template * { visibility: visible; }
+      body * { visibility: hidden !important; }
+      #print-card-template, #print-card-template * { visibility: visible !important; }
+      #print-container-hidden { display: block !important; }
       #print-card-template {
         display: block !important;
-        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-        width: 100%; max-width: 420px; margin: 0; padding: 40px 30px;
-        box-shadow: none; border: none; background: #fff !important; text-align: center;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        position: fixed !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100% !important; 
+        height: 100% !important;
+        margin: 0 !important; 
+        padding: 40px 30px !important;
+        box-shadow: none !important; 
+        border: none !important; 
+        background: #fff !important; 
+        text-align: center !important;
+        z-index: 9999 !important;
       }
     }
 
