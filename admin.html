@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Library SheetJS untuk Export Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     body { background: #0F0F11; min-height: 100vh; }
@@ -124,7 +126,7 @@
     .card-label { font-size: var(--text-xs); color: var(--gray-500); font-weight: var(--fw-medium); text-transform: uppercase; }
 
     .live-courts-section, .table-container { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); overflow: hidden; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--gray-200); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--gray-200); flex-wrap: wrap; gap: 10px; }
     .section-title { font-size: var(--text-lg); font-weight: var(--fw-semibold); color: var(--gray-900); }
     .btn-refresh { height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-sm); background: var(--gray-100); border: none; cursor: pointer; font-size: var(--text-sm); color: var(--gray-700); }
     
@@ -247,22 +249,43 @@
         </div>
       </div>
 
-      <!-- LOG PANEL -->
+      <!-- LOG PANEL (DENGAN FILTER TANGGAL & TOMBOL EXPORT) -->
       <div class="admin-panel" id="panel-log">
-        <div class="admin-page-header"><h1 class="page-title">Log Adjustment</h1><p class="page-subtitle">Riwayat & manajemen data transaksi</p></div>
+        <div class="admin-page-header">
+          <div><h1 class="page-title">Log Adjustment</h1><p class="page-subtitle">Riwayat & manajemen data transaksi</p></div>
+          <button class="btn btn-secondary" id="btn-open-modal-export" style="background:#059669;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;">📥 Export to Excel</button>
+        </div>
         <div class="content-area">
+          <!-- Filter Range Tanggal -->
+          <div class="card" style="background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow-1); display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+            <div style="flex:1; min-width:150px;">
+              <label style="font-size:12px; font-weight:600; color:var(--gray-600);">Dari Tanggal</label>
+              <input type="date" id="filter-start-date" class="form-input" style="color:#000; border:1px solid #ccc; margin-top:4px;" />
+            </div>
+            <div style="flex:1; min-width:150px;">
+              <label style="font-size:12px; font-weight:600; color:var(--gray-600);">Sampai Tanggal</label>
+              <input type="date" id="filter-end-date" class="form-input" style="color:#000; border:1px solid #ccc; margin-top:4px;" />
+            </div>
+            <button id="btn-apply-filter" class="btn" style="height:42px; padding:0 16px; background:#991B1B; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Filter</button>
+            <button id="btn-reset-filter" class="btn" style="height:42px; padding:0 16px; background:#e5e7eb; color:#374151; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Reset</button>
+          </div>
+
           <div class="table-container">
+            <div class="section-header">
+              <h2 class="section-title">Riwayat Transaksi</h2>
+              <button class="btn-refresh" id="btn-refresh-log">Refresh</button>
+            </div>
             <div style="overflow-x:auto;">
               <table class="data-table">
                 <thead><tr><th>#</th><th>ID Transaksi</th><th>Court</th><th>PIC</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
-                <tbody id="log-table-body"></tbody>
+                <tbody id="log-table-body"><tr><td colspan="7" style="text-align:center;padding:24px;">Memuat data...</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- QR PANEL (DENGAN TOMBOL MODAL & TABEL DIREKTORI) -->
+      <!-- QR PANEL -->
       <div class="admin-panel" id="panel-qr">
         <div class="admin-page-header">
           <div><h1 class="page-title">Direktori QR Code Lapangan</h1><p class="page-subtitle">Kelola dan cetak ulang QR Code lapangan terdaftar</p></div>
@@ -295,7 +318,7 @@
         </div>
       </div>
 
-      <!-- MANAJEMEN ADMIN PANEL (DENGAN TOMBOL MODAL) -->
+      <!-- MANAJEMEN ADMIN PANEL -->
       <div class="admin-panel" id="panel-admin-mgmt">
         <div class="admin-page-header">
           <div><h1 class="page-title">Manajemen Admin</h1><p class="page-subtitle">Kelola akun admin dan hak akses sistem</p></div>
@@ -329,6 +352,19 @@
             </form>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXPORT EXCEL -->
+  <div class="modal-backdrop" id="modal-export">
+    <div class="modal-box">
+      <div class="modal-header"><h3 style="font-size:18px;font-weight:bold;">Export Data ke Excel</h3><button class="modal-close" id="btn-close-modal-export">✕</button></div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div><label style="font-size:13px;font-weight:600;">Dari Tanggal</label><input type="date" id="export-start-date" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" /></div>
+        <div><label style="font-size:13px;font-weight:600;">Sampai Tanggal</label><input type="date" id="export-end-date" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" /></div>
+        <p style="font-size: 11px; color: var(--gray-500);">*Kosongkan untuk mengexport seluruh data riwayat aktivitas.</p>
+        <button id="btn-confirm-export" style="padding:10px;background:#059669;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Download File Excel</button>
       </div>
     </div>
   </div>
@@ -490,6 +526,10 @@
     document.getElementById('btn-open-modal-admin').addEventListener('click', () => document.getElementById('modal-admin').classList.add('active'));
     document.getElementById('btn-close-modal-admin').addEventListener('click', () => document.getElementById('modal-admin').classList.remove('active'));
 
+    // Modal Triggers (Export Excel)
+    document.getElementById('btn-open-modal-export').addEventListener('click', () => document.getElementById('modal-export').classList.add('active'));
+    document.getElementById('btn-close-modal-export').addEventListener('click', () => document.getElementById('modal-export').classList.remove('active'));
+
     async function fetchData() {
       try {
         const res = await fetch(GAS_URL, { redirect: 'follow' });
@@ -540,25 +580,105 @@
       updateLiveCourts();
     });
 
+    // Log Data & Filter Tanggal
     async function fetchAndRenderLog() {
       allData = await fetchData();
+      applyLogFilter();
+    }
+
+    function renderLogTable(data) {
       const tbody = document.getElementById('log-table-body');
-      if (allData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;">Tidak ada data log</td></tr>`;
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;">Tidak ada data log transaksi</td></tr>`;
         return;
       }
-      tbody.innerHTML = allData.map((d, i) => `
+      tbody.innerHTML = data.map((d, i) => `
         <tr>
           <td>${i + 1}</td>
           <td><span class="txn-id">${d.txnId}</span></td>
           <td><strong>${d.courtId}</strong></td>
           <td>${d.picName}</td>
-          <td>${new Date(d.checkIn).toLocaleTimeString('id-ID')}</td>
-          <td>${d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID') : '—'}</td>
+          <td>${new Date(d.checkIn).toLocaleString('id-ID')}</td>
+          <td>${d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '—'}</td>
           <td><span class="status-badge ${d.status === 'Active' ? 'status-active' : 'status-completed'}">${d.status}</span></td>
         </tr>
       `).join('');
     }
+
+    function applyLogFilter() {
+      const startDateVal = document.getElementById('filter-start-date').value;
+      const endDateVal = document.getElementById('filter-end-date').value;
+
+      let filtered = [...allData];
+
+      if (startDateVal) {
+        const startTs = new Date(startDateVal).setHours(0,0,0,0);
+        filtered = filtered.filter(d => d.checkIn >= startTs);
+      }
+      if (endDateVal) {
+        const endTs = new Date(endDateVal).setHours(23,59,59,999);
+        filtered = filtered.filter(d => d.checkIn <= endTs);
+      }
+
+      renderLogTable(filtered);
+    }
+
+    document.getElementById('btn-apply-filter').addEventListener('click', applyLogFilter);
+    document.getElementById('btn-reset-filter').addEventListener('click', () => {
+      document.getElementById('filter-start-date').value = '';
+      document.getElementById('filter-end-date').value = '';
+      renderLogTable(allData);
+    });
+    document.getElementById('btn-refresh-log').addEventListener('click', fetchAndRenderLog);
+
+    // Export to Excel Handler
+    document.getElementById('btn-confirm-export').addEventListener('click', () => {
+      const startVal = document.getElementById('export-start-date').value;
+      const endVal = document.getElementById('export-end-date').value;
+
+      let exportData = [...allData];
+
+      if (startVal) {
+        const startTs = new Date(startVal).setHours(0,0,0,0);
+        exportData = exportData.filter(d => d.checkIn >= startTs);
+      }
+      if (endVal) {
+        const endTs = new Date(endVal).setHours(23,59,59,999);
+        exportData = exportData.filter(d => d.checkIn <= endTs);
+      }
+
+      if (exportData.length === 0) {
+        alert('Tidak ada data pada rentang tanggal tersebut.');
+        return;
+      }
+
+      // Format data untuk Excel
+      const rows = exportData.map((d, index) => ({
+        No: index + 1,
+        'ID Transaksi': d.txnId,
+        'Lapangan': d.courtId,
+        'Nama PIC': d.picName,
+        'Check-in': new Date(d.checkIn).toLocaleString('id-ID'),
+        'Check-out': d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : 'Belum Check-out',
+        'Jumlah Anggota': d.members || 0,
+        'Shuttlecock Terpakai': d.shuttle || 0,
+        'Status': d.status
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Log Aktivitas");
+
+      // Generate Nama File Dinamis: Data_Aktivitas_BadmintonKuy-DDMMYYYY
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const fileName = `Data_Aktivitas_BadmintonKuy-${dd}${mm}${yyyy}.xlsx`;
+
+      XLSX.writeFile(workbook, fileName);
+      document.getElementById('modal-export').classList.remove('active');
+    });
 
     // Fetch & Render QR List
     async function fetchAndRenderQRList() {
