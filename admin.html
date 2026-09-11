@@ -11,6 +11,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <!-- Library SheetJS untuk Export Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Library html2canvas untuk Download Kartu QR sebagai JPG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     body { background: #0F0F11; min-height: 100vh; }
@@ -249,14 +251,13 @@
         </div>
       </div>
 
-      <!-- LOG PANEL (DENGAN FILTER TANGGAL & TOMBOL EXPORT) -->
+      <!-- LOG PANEL -->
       <div class="admin-panel" id="panel-log">
         <div class="admin-page-header">
           <div><h1 class="page-title">Log Adjustment</h1><p class="page-subtitle">Riwayat & manajemen data transaksi</p></div>
           <button class="btn btn-secondary" id="btn-open-modal-export" style="background:#059669;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;">📥 Export to Excel</button>
         </div>
         <div class="content-area">
-          <!-- Filter Range Tanggal -->
           <div class="card" style="background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow-1); display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
             <div style="flex:1; min-width:150px;">
               <label style="font-size:12px; font-weight:600; color:var(--gray-600);">Dari Tanggal</label>
@@ -285,10 +286,10 @@
         </div>
       </div>
 
-      <!-- QR PANEL -->
+      <!-- QR PANEL (DENGAN KARTU TEMPLAT & DOWNLOAD JPG) -->
       <div class="admin-panel" id="panel-qr">
         <div class="admin-page-header">
-          <div><h1 class="page-title">Direktori QR Code Lapangan</h1><p class="page-subtitle">Kelola dan cetak ulang QR Code lapangan terdaftar</p></div>
+          <div><h1 class="page-title">Direktori QR Code Lapangan</h1><p class="page-subtitle">Kelola dan download kartu QR Code lapangan terdaftar</p></div>
           <button class="btn btn-secondary" id="btn-open-modal-qr" style="background:#991B1B;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;">+ Daftar QR Code Baru</button>
         </div>
         <div class="content-area">
@@ -299,20 +300,45 @@
             </div>
             <div style="overflow-x:auto;">
               <table class="data-table">
-                <thead><tr><th>ID QR</th><th>Nama / Nomor Lapangan</th><th>Tanggal Dibuat</th><th>Aksi Cetak</th></tr></thead>
+                <thead><tr><th>ID QR</th><th>Nama / Nomor Lapangan</th><th>Tanggal Dibuat</th><th>Aksi Kartu</th></tr></thead>
                 <tbody id="qr-list-body"><tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--gray-500);">Memuat data QR...</td></tr></tbody>
               </table>
             </div>
           </div>
 
-          <!-- Pratinjau Cetak QR -->
-          <div id="print-section" style="display:none; background: var(--white); padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-1); max-width: 400px; text-align: center; margin: 24px auto 0;">
-            <h2 id="print-court-name" style="font-size: 28px; font-weight: bold; margin-bottom: 16px;">—</h2>
-            <div id="qrcode-display" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
-            <p style="color: var(--gray-600); font-size: 13px; margin-bottom: 20px;">Scan untuk Check-in / Check-out</p>
-            <div style="display: flex; gap: 10px;">
-              <button onclick="document.getElementById('print-section').style.display='none'" class="btn" style="flex:1;padding:8px;background:#e5e7eb;border:none;border-radius:4px;cursor:pointer;">Tutup</button>
-              <button onclick="window.print()" class="btn" style="flex:1;padding:8px;background:#991B1B;color:#fff;border:none;border-radius:4px;cursor:pointer;">Cetak Sekarang</button>
+          <!-- Pratinjau Kartu QR Sesuai Templat -->
+          <div id="print-section" style="display:none; background: #fff; padding: 36px 24px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 420px; text-align: center; margin: 30px auto 0; border: 1px solid #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            
+            <!-- Logo Header -->
+            <div style="width: 72px; height: 72px; background: #E8F5E9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 2px solid #A5D6A7;">
+              <span style="font-size: 32px;">🏸</span>
+            </div>
+
+            <!-- Title: Nama Lapangan -->
+            <h2 id="print-court-name" style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 24px; letter-spacing: 0.5px;">—</h2>
+
+            <!-- Box QR Code dengan Style Hijau Elegan -->
+            <div style="background: #F4FBF7; padding: 24px; border-radius: 16px; border: 2px dashed #81C784; display: inline-block; margin-bottom: 24px;">
+              <div id="qrcode-display" style="display: flex; justify-content: center;"></div>
+            </div>
+
+            <!-- Instruksi -->
+            <p style="color: #475569; font-size: 15px; font-weight: 600; line-height: 1.5; margin-bottom: 24px; padding: 0 16px;">
+              Scan QR Code diatas untuk melakukan Check-In / Mulai Sesi
+            </p>
+
+            <!-- Garis Pemisah Tipis -->
+            <div style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 20px;"></div>
+
+            <!-- Footer: Copyright -->
+            <p style="color: #94a3b8; font-size: 12px; font-weight: 500; letter-spacing: 0.3px;">
+              BadmintonKuy copyright Muhammad Muzany Mulyoutomo
+            </p>
+
+            <!-- Tombol Kontrol (Hidden saat didownload) -->
+            <div class="qr-controls" style="display: flex; gap: 10px; margin-top: 30px;">
+              <button onclick="document.getElementById('print-section').style.display='none'" class="btn" style="flex:1; padding: 12px; background: #f1f5f9; color: #475569; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Tutup</button>
+              <button id="btn-download-jpg" class="btn" style="flex:1; padding: 12px; background: #059669; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">📥 Download JPG</button>
             </div>
           </div>
         </div>
@@ -652,7 +678,6 @@
         return;
       }
 
-      // Format data untuk Excel
       const rows = exportData.map((d, index) => ({
         No: index + 1,
         'ID Transaksi': d.txnId,
@@ -669,7 +694,6 @@
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Log Aktivitas");
 
-      // Generate Nama File Dinamis: Data_Aktivitas_BadmintonKuy-DDMMYYYY
       const now = new Date();
       const dd = String(now.getDate()).padStart(2, '0');
       const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -697,7 +721,7 @@
             <td style="font-family:monospace;font-size:12px;">${q.idQr}</td>
             <td><strong>${q.courtName}</strong></td>
             <td>${new Date(Number(q.createdAt)).toLocaleDateString('id-ID')}</td>
-            <td><button class="action-btn" onclick="previewQR('${q.courtName}')" title="Cetak QR">🖨️</button></td>
+            <td><button class="action-btn" onclick="previewQR('${q.courtName}')" title="Preview Kartu QR">🖨️</button></td>
           </tr>
         `).join('');
       } catch (e) {
@@ -711,10 +735,31 @@
       const container = document.getElementById('qrcode-display');
       container.innerHTML = '';
       document.getElementById('print-court-name').textContent = courtName;
-      new QRCode(container, { text: courtName, width: 220, height: 220 });
+      new QRCode(container, { text: courtName, width: 200, height: 200 });
       document.getElementById('print-section').style.display = 'block';
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
+
+    // Download Kartu QR sebagai JPG menggunakan html2canvas
+    document.getElementById('btn-download-jpg').addEventListener('click', function() {
+      const printSection = document.getElementById('print-section');
+      const controls = printSection.querySelector('.qr-controls');
+      
+      // Sembunyikan tombol kontrol sementara saat merender gambar
+      controls.style.display = 'none';
+
+      html2canvas(printSection, { scale: 2, useCORS: true }).then(canvas => {
+        controls.style.display = 'flex'; // Munculkan kembali tombol
+
+        const link = document.createElement('a');
+        link.download = `Kartu-QR-${document.getElementById('print-court-name').textContent}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+      }).catch(err => {
+        controls.style.display = 'flex';
+        alert('Gagal mendownload gambar kartu QR.');
+      });
+    });
 
     // Submit QR Baru
     document.getElementById('form-add-qr').addEventListener('submit', async function(e) {
@@ -760,7 +805,7 @@
       const nama = document.getElementById('new-admin-name').value;
       const pwd = document.getElementById('new-admin-pwd').value;
       const chatId = document.getElementById('new-admin-chatid').value;
-      const role = document.getElementById('new-admin-role').value;
+      const role = document.getElementById('new-admin-role',).value;
       try {
         const fd = new URLSearchParams({ action: 'add_admin', nama_admin: nama, password: pwd, role: role, telegram_chat_id: chatId });
         await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
