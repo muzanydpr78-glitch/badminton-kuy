@@ -4,1728 +4,454 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Badminton Court Manager — Admin Panel untuk monitoring dan manajemen data lapangan badminton." />
+  <meta name="description" content="BadmintonKuy System — Admin Panel untuk monitoring dan manajemen data lapangan badminton." />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Admin Panel — Badminton Court Manager</title>
+  <title>Admin Panel — BadmintonKuy System</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json">
-  <!-- Tambahkan library QRCode.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    /* ══════════════════════════════════════════════════════════
-       ADMIN PANEL STYLES
-    ══════════════════════════════════════════════════════════ */
+    body { background: #0F0F11; min-height: 100vh; }
+    .admin-screen { display: none; }
+    .admin-screen.active { display: block; }
 
-    body {
-      background: #0F0F11;
-      min-height: 100vh;
-    }
-
-    /* ── Admin Screens ─────────────────────────────────────── */
-    .admin-screen {
-      display: none;
-    }
-
-    .admin-screen.active {
-      display: block;
-    }
-
-    /* ══════════════════════════════════════════════════════════
-       SCREEN A1 — LOGIN
-    ══════════════════════════════════════════════════════════ */
     #screen-login {
-      min-height: 100vh;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-4);
-      background: linear-gradient(135deg, #0F0F11 0%, #1A0505 50%, #0F0F11 100%);
-      position: relative;
-      overflow: hidden;
+      min-height: 100vh; display: none; align-items: center; justify-content: center;
+      padding: var(--space-4); background: linear-gradient(135deg, #0F0F11 0%, #1A0505 50%, #0F0F11 100%);
+      position: relative; overflow: hidden;
     }
-
-    #screen-login.active {
-      display: flex;
-    }
-
-    /* Decorative background elements */
-    .login-bg-decoration {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .login-bg-circle {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(155, 28, 28, 0.15) 0%, transparent 70%);
-    }
-
-    .login-bg-circle.c1 {
-      width: 600px;
-      height: 600px;
-      top: -200px;
-      right: -200px;
-    }
-
-    .login-bg-circle.c2 {
-      width: 400px;
-      height: 400px;
-      bottom: -100px;
-      left: -150px;
-    }
-
+    #screen-login.active { display: flex; }
+    .login-bg-decoration { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .login-bg-circle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(155, 28, 28, 0.15) 0%, transparent 70%); }
+    .login-bg-circle.c1 { width: 600px; height: 600px; top: -200px; right: -200px; }
+    .login-bg-circle.c2 { width: 400px; height: 400px; bottom: -100px; left: -150px; }
     .login-card {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: var(--radius-2xl);
-      padding: var(--space-8);
-      width: 100%;
-      max-width: 420px;
-      animation: slide-up 0.5s ease-out;
+      background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-2xl);
+      padding: var(--space-8); width: 100%; max-width: 420px; animation: slide-up 0.5s ease-out;
     }
-
-    .login-logo {
-      text-align: center;
-      margin-bottom: var(--space-8);
-    }
-
+    .login-logo { text-align: center; margin-bottom: var(--space-8); }
     .login-logo-icon {
-      width: 72px;
-      height: 72px;
-      background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto var(--space-4);
-      box-shadow: 0 8px 32px rgba(155, 28, 28, 0.4);
+      width: 72px; height: 72px; background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
+      border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--space-4); box-shadow: 0 8px 32px rgba(155, 28, 28, 0.4);
     }
-
-    .login-logo-icon svg {
-      width: 40px;
-      height: 40px;
-    }
-
-    .login-logo h1 {
-      font-size: var(--text-xl);
-      font-weight: var(--fw-bold);
-      color: var(--white);
-    }
-
-    .login-logo p {
-      font-size: var(--text-md);
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 4px;
-    }
-
-    .login-divider {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-    }
-
-    .login-divider::before,
-    .login-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .login-divider span {
-      font-size: var(--text-xs);
-      color: rgba(255, 255, 255, 0.4);
-      white-space: nowrap;
-    }
-
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-4);
-    }
-
-    .login-form .form-label {
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    .login-form .form-input {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: rgba(255, 255, 255, 0.15);
-      color: var(--white);
-    }
-
-    .login-form .form-input::placeholder {
-      color: rgba(255, 255, 255, 0.3);
-    }
-
-    .login-form .form-input:focus {
-      border-color: var(--maroon-700);
-      box-shadow: 0 0 0 3px rgba(155, 28, 28, 0.25);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .login-form .input-toggle {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .login-form .input-toggle:hover {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
+    .login-logo-icon svg { width: 40px; height: 40px; }
+    .login-logo h1 { font-size: var(--text-xl); font-weight: var(--fw-bold); color: var(--white); }
+    .login-logo p { font-size: var(--text-md); color: rgba(255, 255, 255, 0.5); margin-top: 4px; }
+    .login-divider { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-6); }
+    .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
+    .login-divider span { font-size: var(--text-xs); color: rgba(255, 255, 255, 0.4); white-space: nowrap; }
+    .login-form { display: flex; flex-direction: column; gap: var(--space-4); }
+    .login-form .form-label { color: rgba(255, 255, 255, 0.7); }
+    .login-form .form-input { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); color: var(--white); }
+    .login-form .form-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    .login-form .form-input:focus { border-color: var(--maroon-700); box-shadow: 0 0 0 3px rgba(155, 28, 28, 0.25); background: rgba(255, 255, 255, 0.08); }
+    .login-form .input-toggle { color: rgba(255, 255, 255, 0.5); }
+    .login-form .input-toggle:hover { color: rgba(255, 255, 255, 0.8); }
     #login-error {
-      background: rgba(220, 38, 38, 0.15);
-      border: 1px solid rgba(220, 38, 38, 0.3);
-      border-radius: var(--radius-sm);
-      padding: 12px var(--space-4);
-      color: #FCA5A5;
-      font-size: var(--text-md);
-      display: none;
-      text-align: center;
-      animation: slide-up 0.2s ease-out;
+      background: rgba(220, 38, 38, 0.15); border: 1px solid rgba(220, 38, 38, 0.3);
+      border-radius: var(--radius-sm); padding: 12px var(--space-4); color: #FCA5A5;
+      font-size: var(--text-md); display: none; text-align: center; animation: slide-up 0.2s ease-out;
     }
+    #login-error.visible { display: block; }
 
-    #login-error.visible {
-      display: block;
-    }
+    #admin-layout { display: none; min-height: 100vh; background: var(--gray-50); }
+    #admin-layout.active { display: block; }
 
-    /* ══════════════════════════════════════════════════════════
-       ADMIN LAYOUT (Dashboard & Log)
-    ══════════════════════════════════════════════════════════ */
-    #admin-layout {
-      display: none;
-      min-height: 100vh;
-      background: var(--gray-50);
-    }
-
-    #admin-layout.active {
-      display: block;
-    }
-
-    /* ── Fixed Navbar ──────────────────────────────────────── */
     .admin-navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      height: 64px;
-      background: rgba(15, 15, 17, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      align-items: center;
-      padding: 0 var(--space-6);
-      gap: var(--space-4);
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px;
+      background: rgba(15, 15, 17, 0.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center;
+      padding: 0 var(--space-6); gap: var(--space-4);
     }
-
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
+    .navbar-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; flex-shrink: 0; }
     .navbar-brand-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
+      width: 36px; height: 36px; background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
+      border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px;
     }
-
-    .navbar-brand-text {
-      font-size: var(--text-md);
-      font-weight: var(--fw-semibold);
-      color: var(--white);
-    }
-
-    .navbar-brand-sub {
-      font-size: var(--text-xs);
-      color: rgba(255, 255, 255, 0.45);
-    }
-
-    .navbar-nav {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-left: var(--space-6);
-      flex: 1;
-    }
-
+    .navbar-brand-text { font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--white); }
+    .navbar-brand-sub { font-size: var(--text-xs); color: rgba(255, 255, 255, 0.45); }
+    .navbar-nav { display: flex; align-items: center; gap: 4px; margin-left: var(--space-6); flex: 1; }
     .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      height: 40px;
-      padding: 0 var(--space-4);
-      border-radius: var(--radius-sm);
-      font-size: var(--text-md);
-      font-weight: var(--fw-medium);
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      transition: all var(--transition-normal);
-      border: none;
-      background: none;
+      display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 var(--space-4);
+      border-radius: var(--radius-sm); font-size: var(--text-md); font-weight: var(--fw-medium);
+      color: rgba(255, 255, 255, 0.6); cursor: pointer; transition: all var(--transition-normal); border: none; background: none;
     }
+    .nav-link:hover { color: var(--white); background: rgba(255, 255, 255, 0.08); }
+    .nav-link.active { color: var(--white); background: rgba(155, 28, 28, 0.4); }
+    .nav-link svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-    .nav-link:hover {
-      color: var(--white);
-      background: rgba(255, 255, 255, 0.08);
-    }
-
-    .nav-link.active {
-      color: var(--white);
-      background: rgba(155, 28, 28, 0.4);
-    }
-
-    .nav-link svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-    }
-
-    .navbar-right {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-left: auto;
-    }
-
+    .navbar-right { display: flex; align-items: center; gap: var(--space-3); margin-left: auto; }
     .navbar-logout {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      height: 38px;
-      padding: 0 var(--space-4);
-      border-radius: var(--radius-sm);
-      font-size: var(--text-md);
-      font-weight: var(--fw-medium);
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      transition: all var(--transition-normal);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: none;
+      display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 var(--space-4);
+      border-radius: var(--radius-sm); font-size: var(--text-md); font-weight: var(--fw-medium);
+      color: rgba(255, 255, 255, 0.6); cursor: pointer; transition: all var(--transition-normal);
+      border: 1px solid rgba(255, 255, 255, 0.12); background: none;
     }
+    .navbar-logout:hover { color: #FCA5A5; border-color: rgba(220, 38, 38, 0.4); background: rgba(220, 38, 38, 0.1); }
 
-    .navbar-logout:hover {
-      color: #FCA5A5;
-      border-color: rgba(220, 38, 38, 0.4);
-      background: rgba(220, 38, 38, 0.1);
-    }
-
-    /* Hamburger Menu */
     .navbar-hamburger {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      color: var(--white);
-      margin-left: auto;
-      flex-direction: column;
-      gap: 5px;
-      padding: 8px;
-      transition: background var(--transition-normal);
+      display: none; background: none; border: none; cursor: pointer; width: 40px; height: 40px;
+      align-items: center; justify-content: center; border-radius: var(--radius-sm); color: var(--white);
+      margin-left: auto; flex-direction: column; gap: 5px; padding: 8px; transition: background var(--transition-normal);
     }
+    .navbar-hamburger:hover { background: rgba(255, 255, 255, 0.1); }
+    .hamburger-line { width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: all 0.25s ease; display: block; }
 
-    .navbar-hamburger:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .hamburger-line {
-      width: 22px;
-      height: 2px;
-      background: currentColor;
-      border-radius: 2px;
-      transition: all 0.25s ease;
-      display: block;
-    }
-
-    /* Mobile Drawer */
     .mobile-drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 200;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 200;
+      opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease;
     }
-
-    .mobile-drawer-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
+    .mobile-drawer-overlay.active { opacity: 1; visibility: visible; }
     .mobile-drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: 280px;
-      background: #1A1A1E;
-      z-index: 201;
-      transform: translateX(100%);
-      transition: transform 0.25s ease-out;
-      display: flex;
-      flex-direction: column;
-      padding: var(--space-6);
-      gap: var(--space-2);
+      position: fixed; top: 0; right: 0; bottom: 0; width: 280px; background: #1A1A1E; z-index: 201;
+      transform: translateX(100%); transition: transform 0.25s ease-out; display: flex; flex-direction: column; padding: var(--space-6); gap: var(--space-2);
     }
-
-    .mobile-drawer.active {
-      transform: translateX(0);
-    }
-
-    .drawer-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--space-4);
-      padding-bottom: var(--space-4);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .drawer-title {
-      color: var(--white);
-      font-weight: var(--fw-semibold);
-      font-size: var(--text-md);
-    }
-
-    .drawer-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: none;
-      cursor: pointer;
-      color: var(--white);
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
+    .mobile-drawer.active { transform: translateX(0); }
+    .drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .drawer-title { color: var(--white); font-weight: var(--fw-semibold); font-size: var(--text-md); }
+    .drawer-close { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: none; cursor: pointer; color: var(--white); font-size: 18px; display: flex; align-items: center; justify-content: center; }
     .drawer-nav-link {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      height: 48px;
-      padding: 0 var(--space-4);
-      border-radius: var(--radius-sm);
-      color: rgba(255, 255, 255, 0.7);
-      font-size: var(--text-base);
-      font-weight: var(--fw-medium);
-      cursor: pointer;
-      border: none;
-      background: none;
-      transition: all var(--transition-normal);
-      width: 100%;
+      display: flex; align-items: center; gap: var(--space-3); height: 48px; padding: 0 var(--space-4);
+      border-radius: var(--radius-sm); color: rgba(255, 255, 255, 0.7); font-size: var(--text-base); font-weight: var(--fw-medium);
+      cursor: pointer; border: none; background: none; transition: all var(--transition-normal); width: 100%;
     }
+    .drawer-nav-link:hover { color: var(--white); background: rgba(255, 255, 255, 0.08); }
+    .drawer-nav-link.active { color: var(--white); background: rgba(155, 28, 28, 0.4); }
+    .drawer-logout { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: var(--space-4); }
 
-    .drawer-nav-link:hover {
-      color: var(--white);
-      background: rgba(255, 255, 255, 0.08);
+    .admin-content { padding-top: 64px; }
+    .admin-panel { display: none; min-height: calc(100vh - 64px); }
+    .admin-panel.active { display: block; }
+    .admin-page-header { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: var(--space-6) var(--space-8); }
+    @media (max-width: 768px) { .admin-page-header { padding: var(--space-4); } }
+    .page-title { font-size: var(--text-xl); font-weight: var(--fw-bold); color: var(--gray-900); }
+    .page-subtitle { font-size: var(--text-md); color: var(--gray-500); margin-top: 4px; }
+    .page-date { font-size: var(--text-md); color: var(--gray-500); }
+
+    #panel-dashboard .content-area, #panel-log .content-area, #panel-qr .content-area, #panel-settings .content-area, #panel-admin-mgmt .content-area {
+      padding: var(--space-6) var(--space-8); display: flex; flex-direction: column; gap: var(--space-6);
     }
-
-    .drawer-nav-link.active {
-      color: var(--white);
-      background: rgba(155, 28, 28, 0.4);
-    }
-
-    .drawer-nav-link svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-
-    .drawer-logout {
-      margin-top: auto;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: var(--space-4);
-    }
-
-    /* ── Admin Content ─────────────────────────────────────── */
-    .admin-content {
-      padding-top: 64px;
-      /* navbar height */
-    }
-
-    .admin-panel {
-      display: none;
-      min-height: calc(100vh - 64px);
-    }
-
-    .admin-panel.active {
-      display: block;
-    }
-
-    .admin-page-header {
-      background: var(--white);
-      border-bottom: 1px solid var(--gray-200);
-      padding: var(--space-6) var(--space-8);
-    }
-
     @media (max-width: 768px) {
-      .admin-page-header {
-        padding: var(--space-4) var(--space-4);
-      }
+      #panel-dashboard .content-area, #panel-log .content-area, #panel-qr .content-area, #panel-settings .content-area, #panel-admin-mgmt .content-area { padding: var(--space-4); }
     }
 
-    .page-title {
-      font-size: var(--text-xl);
-      font-weight: var(--fw-bold);
-      color: var(--gray-900);
-    }
-
-    .page-subtitle {
-      font-size: var(--text-md);
-      color: var(--gray-500);
-      margin-top: 4px;
-    }
-
-    .page-date {
-      font-size: var(--text-md);
-      color: var(--gray-500);
-    }
-
-    /* ── Dashboard ─────────────────────────────────────────── */
-    #panel-dashboard .content-area {
-      padding: var(--space-6) var(--space-8);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-6);
-    }
-
-    @media (max-width: 768px) {
-      #panel-dashboard .content-area {
-        padding: var(--space-4);
-      }
-    }
-
-    /* Summary Cards Grid */
-    .summary-cards {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 1024px) {
-      .summary-cards {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .summary-cards {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+    @media (max-width: 1024px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .summary-cards { grid-template-columns: 1fr; } }
     .summary-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: var(--space-5);
-      border-left: 4px solid var(--gray-300);
-      box-shadow: var(--shadow-1);
-      opacity: 0;
-      transform: translateY(20px);
+      background: var(--white); border-radius: var(--radius-lg); padding: var(--space-5);
+      border-left: 4px solid var(--gray-300); box-shadow: var(--shadow-1); opacity: 0; transform: translateY(20px);
       transition: box-shadow var(--transition-normal), transform var(--transition-normal);
     }
+    .summary-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
+    .summary-card.animate-in { animation: stagger-in 0.3s ease-out forwards; }
+    .summary-card:nth-child(1) { animation-delay: 0ms; border-left-color: var(--gray-400); }
+    .summary-card:nth-child(2) { animation-delay: 80ms; border-left-color: var(--maroon-700); }
+    .summary-card:nth-child(3) { animation-delay: 160ms; border-left-color: var(--primary-500); }
+    .summary-card:nth-child(4) { animation-delay: 240ms; border-left-color: var(--color-info); }
+    .card-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: var(--space-4); }
+    .card-icon.gray { background: var(--gray-100); }
+    .card-icon.maroon { background: var(--maroon-100); }
+    .card-icon.green { background: var(--primary-100); }
+    .card-icon.blue { background: #DBEAFE; }
+    .card-value { font-size: 36px; font-weight: var(--fw-bold); color: var(--gray-900); line-height: 1; margin-bottom: 6px; animation: counter-up 0.4s ease-out; }
+    .card-label { font-size: var(--text-xs); color: var(--gray-500); font-weight: var(--fw-medium); text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-trend { font-size: var(--text-xs); color: var(--primary-500); margin-top: 6px; font-weight: var(--fw-medium); }
 
-    .summary-card:hover {
-      box-shadow: var(--shadow-2);
-      transform: translateY(-2px);
-    }
-
-    .summary-card.animate-in {
-      animation: stagger-in 0.3s ease-out forwards;
-    }
-
-    .summary-card:nth-child(1) {
-      animation-delay: 0ms;
-      border-left-color: var(--gray-400);
-    }
-
-    .summary-card:nth-child(2) {
-      animation-delay: 80ms;
-      border-left-color: var(--maroon-700);
-    }
-
-    .summary-card:nth-child(3) {
-      animation-delay: 160ms;
-      border-left-color: var(--primary-500);
-    }
-
-    .summary-card:nth-child(4) {
-      animation-delay: 240ms;
-      border-left-color: var(--color-info);
-    }
-
-    .card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      margin-bottom: var(--space-4);
-    }
-
-    .card-icon.gray {
-      background: var(--gray-100);
-    }
-
-    .card-icon.maroon {
-      background: var(--maroon-100);
-    }
-
-    .card-icon.green {
-      background: var(--primary-100);
-    }
-
-    .card-icon.blue {
-      background: #DBEAFE;
-    }
-
-    .card-value {
-      font-size: 36px;
-      font-weight: var(--fw-bold);
-      color: var(--gray-900);
-      line-height: 1;
-      margin-bottom: 6px;
-      animation: counter-up 0.4s ease-out;
-    }
-
-    .card-label {
-      font-size: var(--text-xs);
-      color: var(--gray-500);
-      font-weight: var(--fw-medium);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .card-trend {
-      font-size: var(--text-xs);
-      color: var(--primary-500);
-      margin-top: 6px;
-      font-weight: var(--fw-medium);
-    }
-
-    /* Live Courts Table */
-    .live-courts-section {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-1);
-      overflow: hidden;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-5) var(--space-6);
-      border-bottom: 1px solid var(--gray-200);
-    }
-
-    .section-title {
-      font-size: var(--text-lg);
-      font-weight: var(--fw-semibold);
-      color: var(--gray-900);
-    }
-
+    .live-courts-section { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); overflow: hidden; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--gray-200); }
+    .section-title { font-size: var(--text-lg); font-weight: var(--fw-semibold); color: var(--gray-900); }
     .btn-refresh {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      height: 36px;
-      padding: 0 var(--space-3);
-      border-radius: var(--radius-sm);
-      background: var(--gray-100);
-      border: none;
-      cursor: pointer;
-      font-size: var(--text-sm);
-      font-weight: var(--fw-medium);
-      color: var(--gray-700);
-      transition: all var(--transition-normal);
+      display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 var(--space-3);
+      border-radius: var(--radius-sm); background: var(--gray-100); border: none; cursor: pointer;
+      font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--gray-700); transition: all var(--transition-normal);
     }
+    .btn-refresh:hover { background: var(--gray-200); }
+    .btn-refresh.spinning svg { animation: spin 0.8s linear infinite; }
 
-    .btn-refresh:hover {
-      background: var(--gray-200);
+    .live-table, .data-table { width: 100%; border-collapse: collapse; }
+    .live-table th, .data-table th {
+      text-align: left; padding: 12px var(--space-6); font-size: var(--text-xs); font-weight: var(--fw-semibold);
+      color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
     }
+    .live-table td, .data-table td { padding: var(--space-4) var(--space-6); font-size: var(--text-md); color: var(--gray-900); border-bottom: 1px solid var(--gray-100); }
+    .live-table tr:hover td, .data-table tr:hover td { background: var(--gray-50); }
+    .court-live-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: var(--fw-semibold); color: #991B1B; }
+    .live-duration { font-family: var(--font-mono); font-weight: var(--fw-semibold); color: var(--primary-600); }
+    .empty-state { text-align: center; padding: var(--space-12) var(--space-6); color: var(--gray-500); }
+    .empty-state-icon { font-size: 48px; margin-bottom: var(--space-4); }
 
-    .btn-refresh svg {
-      width: 14px;
-      height: 14px;
-    }
+    .log-toolbar { display: flex; align-items: center; gap: var(--space-3); background: var(--white); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); flex-wrap: wrap; }
+    .search-wrapper { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; background: var(--gray-100); border-radius: var(--radius-sm); padding: 0 var(--space-3); border: 1.5px solid transparent; }
+    .search-wrapper:focus-within { border-color: var(--maroon-700); background: var(--white); }
+    .search-input { flex: 1; height: 40px; border: none; background: transparent; font-size: var(--text-md); outline: none; }
+    .filter-select { height: 44px; padding: 0 var(--space-4); border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); font-size: var(--text-md); background: var(--white); cursor: pointer; outline: none; }
 
-    .btn-refresh.spinning svg {
-      animation: spin 0.8s linear infinite;
-    }
+    .table-container { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-1); overflow: hidden; }
+    .txn-id { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--gray-500); }
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: var(--fw-semibold); }
+    .status-active { background: var(--primary-100); color: var(--primary-700); }
+    .status-completed { background: var(--gray-100); color: var(--gray-500); }
+    .action-btns { display: flex; gap: 6px; align-items: center; }
+    .action-btn { width: 34px; height: 34px; border-radius: var(--radius-xs); border: 1px solid var(--gray-200); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-600); }
+    .action-btn.edit:hover { background: #EFF6FF; color: var(--color-info); }
+    .action-btn.delete:hover { background: #FEF2F2; color: var(--color-error); }
 
-    .live-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .live-table th {
-      text-align: left;
-      padding: 12px var(--space-6);
-      font-size: var(--text-xs);
-      font-weight: var(--fw-semibold);
-      color: var(--gray-500);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--gray-50);
-      border-bottom: 1px solid var(--gray-200);
-    }
-
-    .live-table td {
-      padding: var(--space-4) var(--space-6);
-      font-size: var(--text-md);
-      color: var(--gray-900);
-      border-bottom: 1px solid var(--gray-100);
-    }
-
-    .live-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .live-table tr:hover td {
-      background: var(--gray-50);
-    }
-
-    .court-live-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: var(--fw-semibold);
-      color: #991B1B;
-    }
-
-    .live-duration {
-      font-family: var(--font-mono);
-      font-weight: var(--fw-semibold);
-      color: var(--primary-600);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: var(--space-12) var(--space-6);
-      color: var(--gray-500);
-    }
-
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: var(--space-4);
-    }
-
-    .empty-state p {
-      font-size: var(--text-md);
-    }
-
-    /* ── Log Adjustment Panel ──────────────────────────────── */
-    #panel-log .content-area {
-      padding: var(--space-6) var(--space-8);
-    }
+    .table-footer { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--gray-200); flex-wrap: wrap; gap: var(--space-3); }
+    .pagination { display: flex; gap: 4px; align-items: center; }
+    .page-btn { width: 36px; height: 36px; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .page-btn.active { background: var(--maroon-700); color: var(--white); border-color: var(--maroon-700); }
 
     @media (max-width: 768px) {
-      #panel-log .content-area {
-        padding: var(--space-4);
-      }
+      .navbar-nav, .navbar-logout { display: none !important; }
+      .navbar-hamburger { display: flex !important; }
     }
-
-    /* Toolbar */
-    .log-toolbar {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      background: var(--white);
-      padding: var(--space-4) var(--space-5);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-1);
-      flex-wrap: wrap;
-    }
-
-    .search-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-      min-width: 200px;
-      background: var(--gray-100);
-      border-radius: var(--radius-sm);
-      padding: 0 var(--space-3);
-      border: 1.5px solid transparent;
-      transition: border-color var(--transition-normal);
-    }
-
-    .search-wrapper:focus-within {
-      border-color: var(--maroon-700);
-      background: var(--white);
-    }
-
-    .search-wrapper svg {
-      width: 16px;
-      height: 16px;
-      color: var(--gray-500);
-      flex-shrink: 0;
-    }
-
-    .search-input {
-      flex: 1;
-      height: 40px;
-      border: none;
-      background: transparent;
-      font-size: var(--text-md);
-      font-family: var(--font-family);
-      color: var(--gray-900);
-      outline: none;
-    }
-
-    .search-input::placeholder {
-      color: var(--gray-400);
-    }
-
-    .filter-select {
-      height: 44px;
-      padding: 0 var(--space-4);
-      border: 1.5px solid var(--gray-300);
-      border-radius: var(--radius-sm);
-      font-size: var(--text-md);
-      font-family: var(--font-family);
-      color: var(--gray-700);
-      background: var(--white);
-      cursor: pointer;
-      outline: none;
-      transition: border-color var(--transition-normal);
-    }
-
-    .filter-select:focus {
-      border-color: var(--maroon-700);
-    }
-
-    /* Data Table */
-    .table-container {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-1);
-      overflow: hidden;
-    }
-
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .data-table th {
-      text-align: left;
-      padding: 14px var(--space-4);
-      font-size: var(--text-xs);
-      font-weight: var(--fw-semibold);
-      color: var(--gray-500);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--gray-50);
-      border-bottom: 2px solid var(--gray-200);
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .data-table th:hover {
-      color: var(--gray-900);
-    }
-
-    .data-table th.sorted {
-      color: var(--maroon-700);
-    }
-
-    .data-table td {
-      padding: var(--space-4);
-      font-size: var(--text-sm);
-      color: var(--gray-900);
-      border-bottom: 1px solid var(--gray-100);
-      vertical-align: middle;
-      white-space: nowrap;
-    }
-
-    .data-table tr:hover td {
-      background: #FFF5F5;
-    }
-
-    .data-table tr.highlighted td {
-      background: #FFF7ED;
-    }
-
-    .txn-id {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      color: var(--gray-500);
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-      font-size: 11px;
-      font-weight: var(--fw-semibold);
-    }
-
-    .status-active {
-      background: var(--primary-100);
-      color: var(--primary-700);
-    }
-
-    .status-completed {
-      background: var(--gray-100);
-      color: var(--gray-500);
-    }
-
-    .action-btns {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .action-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: var(--radius-xs);
-      border: 1px solid var(--gray-200);
-      background: var(--white);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      transition: all var(--transition-normal);
-      color: var(--gray-600);
-    }
-
-    .action-btn:hover {
-      background: var(--gray-100);
-      border-color: var(--gray-300);
-    }
-
-    .action-btn.edit:hover {
-      background: #EFF6FF;
-      border-color: #BFDBFE;
-      color: var(--color-info);
-    }
-
-    .action-btn.delete:hover {
-      background: #FEF2F2;
-      border-color: #FECACA;
-      color: var(--color-error);
-    }
-
-    /* Pagination */
-    .table-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-4) var(--space-5);
-      border-top: 1px solid var(--gray-200);
-      flex-wrap: wrap;
-      gap: var(--space-3);
-    }
-
-    .table-info {
-      font-size: var(--text-sm);
-      color: var(--gray-500);
-    }
-
-    .pagination {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .page-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--gray-300);
-      background: var(--white);
-      cursor: pointer;
-      font-size: var(--text-sm);
-      font-weight: var(--fw-medium);
-      color: var(--gray-700);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition-normal);
-    }
-
-    .page-btn:hover {
-      background: var(--gray-100);
-    }
-
-    .page-btn.active {
-      background: var(--maroon-700);
-      color: var(--white);
-      border-color: var(--maroon-700);
-    }
-
-    .page-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* ── Edit Modal Specifics ───────────────────────────────── */
-    .modal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-4);
-    }
-
-    @media (max-width: 480px) {
-      .modal-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .modal-stepper-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .modal-stepper-group .form-label {
-      font-size: var(--text-sm);
-      font-weight: var(--fw-medium);
-      color: var(--gray-700);
-    }
-
-    /* ── Warning Delete ─────────────────────────────────────── */
-    .delete-warning {
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      border-radius: var(--radius-sm);
-      padding: var(--space-4);
-      display: flex;
-      align-items: flex-start;
-      gap: var(--space-3);
-    }
-
-    .delete-warning-icon {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
-    .delete-warning-text {
-      font-size: var(--text-md);
-      color: #991B1B;
-    }
-
-    .delete-record-info {
-      background: var(--gray-100);
-      border-radius: var(--radius-sm);
-      padding: var(--space-3) var(--space-4);
-      font-size: var(--text-sm);
-      font-family: var(--font-mono);
-      color: var(--gray-700);
-    }
-
-    /* ── Responsive table ──────────────────────────────────── */
-    @media (max-width: 768px) {
-      .table-container {
-        overflow-x: auto;
-      }
-
-      .navbar-nav,
-      .navbar-logout {
-        display: none !important;
-      }
-
-      .navbar-hamburger {
-        display: flex !important;
-      }
-    }
-
     @media (min-width: 769px) {
-
-      .mobile-drawer-overlay,
-      .mobile-drawer {
-        display: none !important;
-      }
+      .mobile-drawer-overlay, .mobile-drawer { display: none !important; }
     }
-
-    /* ── Print Style Khusus QR Code ────────────────────────── */
     @media print {
-
-      /* Sembunyikan semua elemen default saat mencetak */
-      body * {
-        visibility: hidden;
-      }
-
-      /* Tampilkan hanya area QR Code */
-      #print-section,
-      #print-section * {
-        visibility: visible;
-      }
-
-      #print-section {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        transform: translateX(-50%);
-        width: 100%;
-        margin-top: 2cm;
-        text-align: center;
-      }
-
-      /* Sembunyikan tombol kontrol di dalam area cetak */
-      .qr-controls {
-        display: none !important;
-      }
-
-      #admin-layout {
-        background: transparent !important;
-      }
+      body * { visibility: hidden; }
+      #print-section, #print-section * { visibility: visible; }
+      #print-section { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 100%; margin-top: 2cm; text-align: center; }
+      .qr-controls { display: none !important; }
+      #admin-layout { background: transparent !important; }
     }
   </style>
 </head>
 
 <body>
+  <div id="toast-container" role="status" aria-live="polite"></div>
+  <div id="offline-banner" role="status"><span>📵</span><span>Tidak ada koneksi internet</span></div>
 
-  <!-- ── Toast Container ──────────────────────────────────────── -->
-  <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
-
-  <!-- ── Offline Banner ───────────────────────────────────────── -->
-  <div id="offline-banner" role="status" aria-live="polite">
-    <span>📵</span>
-    <span>Tidak ada koneksi internet</span>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════
-     SCREEN A1 — LOGIN
-══════════════════════════════════════════════════════════════ -->
-  <div id="screen-login" class="admin-screen active" role="main">
-    <div class="login-bg-decoration" aria-hidden="true">
-      <div class="login-bg-circle c1"></div>
-      <div class="login-bg-circle c2"></div>
-    </div>
-
+  <!-- SCREEN LOGIN -->
+  <div id="screen-login" class="admin-screen active">
+    <div class="login-bg-decoration"><div class="login-bg-circle c1"></div><div class="login-bg-circle c2"></div></div>
     <div class="login-card">
       <div class="login-logo">
-        <div class="login-logo-icon" aria-hidden="true">
+        <div class="login-logo-icon">
           <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 6 C16 12 8 24 16 30 L20 32 L24 30 C32 24 24 12 20 6Z" fill="white" opacity="0.9" />
-            <path d="M20 6 L14 2 L8 10 L16 14Z" fill="white" opacity="0.6" />
-            <path d="M20 6 L22 0 L30 6 L24 12Z" fill="white" opacity="0.6" />
-            <path d="M20 6 L26 2 L32 10 L24 14Z" fill="white" opacity="0.6" />
-            <circle cx="20" cy="32" r="3" fill="white" opacity="0.8" />
+            <path d="M20 6 C16 12 8 24 16 30 L20 32 L24 30 C32 24 24 12 20 6Z" fill="white" opacity="0.9"/>
+            <circle cx="20" cy="32" r="3" fill="white" opacity="0.8"/>
           </svg>
         </div>
         <h1>Badminton Admin</h1>
         <p>Court Management System</p>
       </div>
-
       <div class="login-divider"><span>ADMIN ACCESS</span></div>
-
       <form class="login-form" id="form-login" novalidate>
         <div class="form-group">
           <label class="form-label" for="admin-password">Password</label>
           <div class="input-wrapper">
-            <input id="admin-password" type="password" class="form-input" placeholder="Masukkan password admin"
-              aria-label="Password admin" aria-required="true" autocomplete="current-password" required />
-            <button type="button" class="input-toggle" id="toggle-password" aria-label="Toggle tampilkan password">
-              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" aria-hidden="true">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
+            <input id="admin-password" type="password" class="form-input" placeholder="Masukkan password admin" required />
+            <button type="button" class="input-toggle" id="toggle-password">
+              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
             </button>
           </div>
         </div>
-
-        <div id="login-error" role="alert" aria-live="polite">
-          <span>❌ Password salah. Silakan coba lagi.</span>
-        </div>
-
-        <button type="submit" id="btn-login" class="btn btn-secondary btn-full btn-lg"
-          aria-label="Masuk ke panel admin">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            aria-hidden="true">
-            <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" />
-            <polyline points="10 17 15 12 10 7" />
-            <line x1="15" y1="12" x2="3" y2="12" />
-          </svg>
-          Masuk ke Panel
-        </button>
+        <div id="login-error"><span>❌ Password salah. Silakan coba lagi.</span></div>
+        <button type="submit" id="btn-login" class="btn btn-secondary btn-full btn-lg">Masuk ke Panel</button>
       </form>
-
-      <p style="text-align:center;margin-top:var(--space-5);font-size:var(--text-xs);color:rgba(255,255,255,0.3);">
-        Password default: <code style="color:rgba(255,255,255,0.5);">admin123</code>
-      </p>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════════
-     ADMIN LAYOUT (Navbar + Panels)
-══════════════════════════════════════════════════════════════ -->
+  <!-- ADMIN LAYOUT -->
   <div id="admin-layout">
-
-    <!-- ── NAVBAR ─────────────────────────────────────────────── -->
-    <nav class="admin-navbar" role="navigation" aria-label="Admin navigation">
-      <a class="navbar-brand" href="#" aria-label="Badminton Admin home">
-        <div class="navbar-brand-icon" aria-hidden="true">🏸</div>
-        <div>
-          <div class="navbar-brand-text">Badminton</div>
-          <div class="navbar-brand-sub">Admin Panel</div>
-        </div>
+    <nav class="admin-navbar">
+      <a class="navbar-brand" href="#">
+        <div class="navbar-brand-icon">🏸</div>
+        <div><div class="navbar-brand-text">Badminton</div><div class="navbar-brand-sub">Admin Panel</div></div>
       </a>
-
-      <!-- Desktop Nav -->
-      <div class="navbar-nav" role="menubar">
-        <button class="nav-link active" id="nav-dashboard" role="menuitem" aria-current="page" aria-label="Dashboard">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="9" />
-            <rect x="14" y="3" width="7" height="5" />
-            <rect x="14" y="12" width="7" height="9" />
-            <rect x="3" y="16" width="7" height="5" />
-          </svg>
-          Dashboard
-        </button>
-        <button class="nav-link" id="nav-log" role="menuitem" aria-label="Log Data">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-            <polyline points="10 9 9 9 8 9" />
-          </svg>
-          Log Data
-        </button>
-        <!-- Tambahan Nav: Cetak QR -->
-        <button class="nav-link" id="nav-qr" role="menuitem" aria-label="Cetak QR Code">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <rect x="7" y="7" width="3" height="3" />
-            <rect x="14" y="7" width="3" height="3" />
-            <rect x="7" y="14" width="3" height="3" />
-            <rect x="14" y="14" width="3" height="3" />
-          </svg>
-          Cetak QR
-        </button>
-        <!-- Tambahan Nav: Pengaturan -->
-        <button class="nav-link" id="nav-settings" role="menuitem" aria-label="Pengaturan Akun">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-          </svg>
-          Pengaturan
-        </button>
+      <div class="navbar-nav">
+        <button class="nav-link active" id="nav-dashboard">Dashboard</button>
+        <button class="nav-link" id="nav-log">Log Data</button>
+        <button class="nav-link" id="nav-qr">Cetak QR</button>
+        <button class="nav-link" id="nav-admin-mgmt" style="display: none;">Manajemen Admin</button>
+        <button class="nav-link" id="nav-settings">Pengaturan</button>
       </div>
-
-      <!-- Right side -->
       <div class="navbar-right">
-        <span id="admin-greeting-text"
-          style="color: var(--white); font-size: var(--text-sm); font-weight: var(--fw-medium); margin-right: 8px;">Halo,
-          Admin</span>
-        <button class="navbar-logout" id="btn-logout" aria-label="Keluar dari panel admin">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            aria-hidden="true">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          Logout
-        </button>
-
-        <!-- Hamburger -->
-        <button class="navbar-hamburger" id="btn-hamburger" aria-label="Buka menu navigasi" aria-expanded="false"
-          aria-controls="mobile-drawer">
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-        </button>
+        <span id="admin-greeting-text" style="color: var(--white); font-size: var(--text-sm);">Halo, Admin</span>
+        <button class="navbar-logout" id="btn-logout">Logout</button>
+        <button class="navbar-hamburger" id="btn-hamburger"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></button>
       </div>
     </nav>
 
     <!-- Mobile Drawer -->
-    <div class="mobile-drawer-overlay" id="drawer-overlay" aria-hidden="true"></div>
-    <div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-modal="true" aria-label="Navigation menu">
-      <div class="drawer-header">
-        <span class="drawer-title">🏸 Badminton Admin</span>
-        <button class="drawer-close" id="btn-drawer-close" aria-label="Tutup menu">✕</button>
-      </div>
-      <button class="drawer-nav-link active" data-drawer-nav="dashboard" aria-label="Dashboard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"
-          aria-hidden="true">
-          <rect x="3" y="3" width="7" height="9" />
-          <rect x="14" y="3" width="7" height="5" />
-          <rect x="14" y="12" width="7" height="9" />
-          <rect x="3" y="16" width="7" height="5" />
-        </svg>
-        Dashboard
-      </button>
-      <button class="drawer-nav-link" data-drawer-nav="log" aria-label="Log Data">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"
-          aria-hidden="true">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-        Log Data
-      </button>
-      <!-- Tambahan Drawer: Cetak QR -->
-      <button class="drawer-nav-link" data-drawer-nav="qr" aria-label="Cetak QR Code">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"
-          aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-          <rect x="7" y="7" width="3" height="3" />
-          <rect x="14" y="7" width="3" height="3" />
-          <rect x="7" y="14" width="3" height="3" />
-          <rect x="14" y="14" width="3" height="3" />
-        </svg>
-        Cetak QR
-      </button>
-      <!-- Tambahan Drawer: Pengaturan -->
-      <button class="drawer-nav-link" data-drawer-nav="settings" aria-label="Pengaturan Akun">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"
-          aria-hidden="true">
-          <circle cx="12" cy="12" r="3" />
-          <path
-            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-        </svg>
-        Pengaturan
-      </button>
-      <div class="drawer-logout">
-        <button class="drawer-nav-link" id="btn-drawer-logout" style="color:#FCA5A5;" aria-label="Logout">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"
-            aria-hidden="true">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          Logout
-        </button>
-      </div>
+    <div class="mobile-drawer-overlay" id="drawer-overlay"></div>
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="drawer-header"><span class="drawer-title">🏸 Badminton Admin</span><button class="drawer-close" id="btn-drawer-close">✕</button></div>
+      <button class="drawer-nav-link active" data-drawer-nav="dashboard">Dashboard</button>
+      <button class="drawer-nav-link" data-drawer-nav="log">Log Data</button>
+      <button class="drawer-nav-link" data-drawer-nav="qr">Cetak QR</button>
+      <button class="drawer-nav-link" data-drawer-nav="admin-mgmt" id="drawer-nav-admin-mgmt" style="display: none;">Manajemen Admin</button>
+      <button class="drawer-nav-link" data-drawer-nav="settings">Pengaturan</button>
+      <div class="drawer-logout"><button class="drawer-nav-link" id="btn-drawer-logout" style="color:#FCA5A5;">Logout</button></div>
     </div>
 
-    <!-- ── CONTENT AREA ─────────────────────────────────────── -->
     <div class="admin-content">
-
-      <!-- ╔═══════════════════════════════════════════════════════
-         ║ PANEL A2 — DASHBOARD
-         ╚═══════════════════════════════════════════════════════ -->
+      <!-- DASHBOARD PANEL -->
       <div class="admin-panel active" id="panel-dashboard">
         <div class="admin-page-header">
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);">
-            <div>
-              <h1 class="page-title">Dashboard Operasional</h1>
-              <p class="page-subtitle">Ringkasan aktivitas lapangan hari ini</p>
-            </div>
-            <div class="page-date" id="current-date-display" aria-live="off">—</div>
+            <div><h1 class="page-title">Dashboard Operasional</h1><p class="page-subtitle">Ringkasan aktivitas lapangan hari ini</p></div>
+            <div class="page-date" id="current-date-display">—</div>
           </div>
         </div>
-
         <div class="content-area">
-          <!-- Summary Cards -->
-          <section aria-label="Ringkasan metrik">
-            <div class="summary-cards" id="summary-cards">
-              <!-- Card 1: Total Sesi -->
-              <div class="summary-card" id="card-total-sessions">
-                <div class="card-icon gray" aria-hidden="true">📋</div>
-                <div class="card-value" id="metric-total-sessions">—</div>
-                <div class="card-label">Total Sesi Hari Ini</div>
-                <div class="card-trend" id="trend-sessions"></div>
-              </div>
-              <!-- Card 2: Sesi Aktif -->
-              <div class="summary-card" id="card-active-sessions">
-                <div class="card-icon maroon" aria-hidden="true">⚡</div>
-                <div class="card-value" id="metric-active-sessions" style="color:var(--maroon-700);">—</div>
-                <div class="card-label">Sesi Aktif (Live)</div>
-                <div class="card-trend" style="color:var(--maroon-700);" id="trend-active"></div>
-              </div>
-              <!-- Card 3: Total Pemain -->
-              <div class="summary-card" id="card-total-players">
-                <div class="card-icon green" aria-hidden="true">👥</div>
-                <div class="card-value" id="metric-total-players" style="color:var(--primary-600);">—</div>
-                <div class="card-label">Total Pemain Hadir</div>
-              </div>
-              <!-- Card 4: Shuttlecock -->
-              <div class="summary-card" id="card-shuttlecock">
-                <div class="card-icon blue" aria-hidden="true">🏸</div>
-                <div class="card-value" id="metric-shuttlecock" style="color:var(--color-info);">—</div>
-                <div class="card-label">Shuttlecock Terpakai</div>
-              </div>
-            </div>
-          </section>
-
-          <!-- Live Courts -->
-          <section class="live-courts-section" aria-label="Lapangan aktif saat ini">
-            <div class="section-header">
-              <h2 class="section-title">
-                <span class="live-dot" style="display:inline-block;margin-right:8px;" aria-hidden="true"></span>
-                Lapangan Aktif Saat Ini
-              </h2>
-              <button class="btn-refresh" id="btn-refresh-dashboard" aria-label="Refresh data lapangan aktif">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                  <path d="M23 4v6h-6" />
-                  <path d="M1 20v-6h6" />
-                  <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-                </svg>
-                Refresh
-              </button>
-            </div>
+          <div class="summary-cards">
+            <div class="summary-card"><div class="card-icon gray">📋</div><div class="card-value" id="metric-total-sessions">—</div><div class="card-label">Total Sesi Hari Ini</div><div class="card-trend" id="trend-sessions"></div></div>
+            <div class="summary-card"><div class="card-icon maroon">⚡</div><div class="card-value" id="metric-active-sessions" style="color:var(--maroon-700);">—</div><div class="card-label">Sesi Aktif (Live)</div><div class="card-trend" style="color:var(--maroon-700);" id="trend-active"></div></div>
+            <div class="summary-card"><div class="card-icon green">👥</div><div class="card-value" id="metric-total-players" style="color:var(--primary-600);">—</div><div class="card-label">Total Pemain Hadir</div></div>
+            <div class="summary-card"><div class="card-icon blue">🏸</div><div class="card-value" id="metric-shuttlecock" style="color:var(--color-info);">—</div><div class="card-label">Shuttlecock Terpakai</div></div>
+          </div>
+          <div class="live-courts-section">
+            <div class="section-header"><h2 class="section-title"><span class="live-dot" style="margin-right:8px;"></span>Lapangan Aktif Saat Ini</h2><button class="btn-refresh" id="btn-refresh-dashboard">Refresh</button></div>
             <div style="overflow-x:auto;">
-              <table class="live-table" id="live-courts-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Lapangan</th>
-                    <th scope="col">PIC</th>
-                    <th scope="col">Check-in</th>
-                    <th scope="col">Durasi</th>
-                    <th scope="col">ID Transaksi</th>
-                  </tr>
-                </thead>
-                <tbody id="live-courts-body">
-                  <tr>
-                    <td colspan="5">
-                      <div class="empty-state">
-                        <div class="empty-state-icon" aria-hidden="true">🏟️</div>
-                        <p>Tidak ada lapangan aktif saat ini</p>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+              <table class="live-table">
+                <thead><tr><th>Lapangan</th><th>PIC</th><th>Check-in</th><th>Durasi</th><th>ID Transaksi</th></tr></thead>
+                <tbody id="live-courts-body"><tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🏟️</div><p>Tidak ada lapangan aktif saat ini</p></div></td></tr></tbody>
               </table>
             </div>
-          </section>
+          </div>
         </div>
       </div>
 
-      <!-- ╔═══════════════════════════════════════════════════════
-         ║ PANEL A3 — LOG ADJUSTMENT
-         ╚═══════════════════════════════════════════════════════ -->
+      <!-- LOG PANEL -->
       <div class="admin-panel" id="panel-log">
-        <div class="admin-page-header">
-          <h1 class="page-title">Log Adjustment</h1>
-          <p class="page-subtitle">Riwayat & manajemen data transaksi</p>
-        </div>
-
+        <div class="admin-page-header"><h1 class="page-title">Log Adjustment</h1><p class="page-subtitle">Riwayat & manajemen data transaksi</p></div>
         <div class="content-area">
-          <!-- Toolbar -->
           <div class="log-toolbar">
-            <div class="search-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input type="search" id="search-log" class="search-input" placeholder="Cari nama, lapangan, ID..."
-                aria-label="Cari data transaksi" autocomplete="off" />
-            </div>
-            <select id="filter-status" class="filter-select" aria-label="Filter status transaksi">
-              <option value="">Semua Status</option>
-              <option value="Active">Aktif</option>
-              <option value="Completed">Selesai</option>
-            </select>
-            <select id="filter-court" class="filter-select" aria-label="Filter lapangan">
-              <option value="">Semua Lapangan</option>
-            </select>
+            <div class="search-wrapper"><input type="search" id="search-log" class="search-input" placeholder="Cari nama, lapangan, ID..." /></div>
+            <select id="filter-status" class="filter-select"><option value="">Semua Status</option><option value="Active">Aktif</option><option value="Completed">Selesai</option></select>
+            <select id="filter-court" class="filter-select"><option value="">Semua Lapangan</option></select>
           </div>
-
-          <!-- Table -->
           <div class="table-container">
             <div style="overflow-x:auto;">
-              <table class="data-table" id="log-table" aria-label="Data transaksi lapangan">
-                <thead>
-                  <tr>
-                    <th scope="col" data-sort="index" aria-sort="none"># <span aria-hidden="true">↕</span></th>
-                    <th scope="col" data-sort="txnId">ID Transaksi</th>
-                    <th scope="col" data-sort="courtId" aria-sort="none">Court <span aria-hidden="true">↕</span></th>
-                    <th scope="col" data-sort="picName" aria-sort="none">PIC <span aria-hidden="true">↕</span></th>
-                    <th scope="col" data-sort="checkIn">Check-in</th>
-                    <th scope="col" data-sort="checkOut">Check-out</th>
-                    <th scope="col">Anggota</th>
-                    <th scope="col">Shuttlecock</th>
-                    <th scope="col" data-sort="status">Status</th>
-                    <th scope="col">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="log-table-body">
-                  <!-- Populated by JS -->
-                </tbody>
+              <table class="data-table" id="log-table">
+                <thead><tr><th>#</th><th>ID Transaksi</th><th>Court</th><th>PIC</th><th>Check-in</th><th>Check-out</th><th>Anggota</th><th>Shuttlecock</th><th>Status</th><th>Aksi</th></tr></thead>
+                <tbody id="log-table-body"></tbody>
               </table>
             </div>
-
-            <div class="table-footer">
-              <span class="table-info" id="table-info" aria-live="polite">—</span>
-              <div class="pagination" id="pagination" role="navigation" aria-label="Pagination">
-                <!-- Populated by JS -->
-              </div>
-            </div>
+            <div class="table-footer"><span class="table-info" id="table-info">—</span><div class="pagination" id="pagination"></div></div>
           </div>
-
-        </div><!-- .content-area -->
-      </div><!-- #panel-log -->
-      <!-- ╔═══════════════════════════════════════════════════════
-         ║ PANEL A4 — CETAK QR
-         ╚═══════════════════════════════════════════════════════ -->
-      <div class="admin-panel" id="panel-qr">
-        <div class="admin-page-header">
-          <h1 class="page-title">Cetak QR Code Lapangan</h1>
-          <p class="page-subtitle">Buat dan cetak QR Code untuk dipasang pada papan lapangan</p>
         </div>
+      </div>
 
+      <!-- QR PANEL -->
+      <div class="admin-panel" id="panel-qr">
+        <div class="admin-page-header"><h1 class="page-title">Cetak QR Code Lapangan</h1><p class="page-subtitle">Buat dan cetak QR Code untuk dipasang pada papan lapangan</p></div>
         <div class="content-area">
-          <!-- Form Control -->
           <div class="card qr-controls" style="max-width: 500px; margin-bottom: var(--space-6);">
             <div class="form-group">
               <label class="form-label" for="qr-court-id">ID / Nama Lapangan</label>
-              <p class="text-body-s text-muted" style="margin-bottom: 8px;">Masukkan ID persis seperti yang digunakan di
-                sistem (contoh: COURT-A)</p>
-              <div style="display:flex; gap:10px;">
-                <input type="text" id="qr-court-id" class="form-input admin-form" placeholder="Contoh: COURT-A" />
-                <button id="btn-generate-qr" class="btn btn-secondary" aria-label="Generate QR">Buat QR</button>
-              </div>
+              <div style="display:flex; gap:10px;"><input type="text" id="qr-court-id" class="form-input admin-form" placeholder="Contoh: COURT-A" /><button id="btn-generate-qr" class="btn btn-secondary">Buat QR</button></div>
             </div>
           </div>
-
-          <!-- Area Preview & Cetak -->
-          <div id="print-section"
-            style="display:none; background: var(--white); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-1); max-width: 400px; text-align: center;">
-            <h2 id="print-court-name"
-              style="font-size: 32px; font-weight: var(--fw-bold); margin-bottom: var(--space-4); color: var(--gray-900);">
-              —</h2>
-
-            <!-- Container QR Code dari qrcode.js -->
-            <div id="qrcode-display" style="display: flex; justify-content: center; margin-bottom: var(--space-5);">
-            </div>
-
-            <p style="color: var(--gray-600); font-size: 14px; margin-bottom: var(--space-6);">Scan QR Code ini untuk
-              Check-in / Check-out</p>
-
-            <button id="btn-print-qr" class="btn btn-primary btn-full qr-controls"
-              style="max-width: 200px; margin: 0 auto;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <rect x="6" y="14" width="12" height="8"></rect>
-              </svg>
-              Cetak Sekarang
-            </button>
+          <div id="print-section" style="display:none; background: var(--white); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-1); max-width: 400px; text-align: center;">
+            <h2 id="print-court-name" style="font-size: 32px; font-weight: var(--fw-bold); margin-bottom: var(--space-4);">—</h2>
+            <div id="qrcode-display" style="display: flex; justify-content: center; margin-bottom: var(--space-5);"></div>
+            <p style="color: var(--gray-600); font-size: 14px; margin-bottom: var(--space-6);">Scan QR Code ini untuk Check-in / Check-out</p>
+            <button id="btn-print-qr" class="btn btn-primary btn-full qr-controls" style="max-width: 200px; margin: 0 auto;">Cetak Sekarang</button>
           </div>
         </div>
       </div>
-      <!-- ╔═══════════════════════════════════════════════════════
-         ║ PANEL A5 — PENGATURAN
-         ╚═══════════════════════════════════════════════════════ -->
-      <div class="admin-panel" id="panel-settings">
-        <div class="admin-page-header">
-          <h1 class="page-title">Pengaturan Akun</h1>
-          <p class="page-subtitle">Ubah nama admin dan password panel</p>
-        </div>
 
+      <!-- MANAJEMEN ADMIN PANEL -->
+      <div class="admin-panel" id="panel-admin-mgmt">
+        <div class="admin-page-header"><h1 class="page-title">Manajemen Admin</h1><p class="page-subtitle">Kelola akun admin dan hak akses sistem</p></div>
+        <div class="content-area">
+          <div class="card" style="max-width: 600px; margin-bottom: var(--space-6);">
+            <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-4);">Tambah Admin Baru</h3>
+            <form id="form-add-admin" style="display: flex; flex-direction: column; gap: var(--space-4);" novalidate>
+              <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" id="new-admin-name" class="form-input admin-form" required placeholder="Contoh: Budi Santoso" /></div>
+              <div class="form-group"><label class="form-label">Password</label><input type="password" id="new-admin-pwd" class="form-input admin-form" required placeholder="Minimal 5 karakter" /></div>
+              <div class="form-group"><label class="form-label">Telegram Chat ID (Opsional untuk notifikasi)</label><input type="text" id="new-admin-chatid" class="form-input admin-form" placeholder="Contoh: 6808739491" /></div>
+              <div class="form-group">
+                <label class="form-label">Role / Hak Akses</label>
+                <select id="new-admin-role" class="form-input filter-select" style="height:48px;">
+                  <option value="Admin Biasa">Admin Biasa (Monitoring & Log)</option>
+                  <option value="Administrator">Administrator (Akses Penuh)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-secondary btn-full" id="btn-submit-admin">Tambah Akun Admin</button>
+            </form>
+          </div>
+          <div class="table-container">
+            <div class="section-header"><h2 class="section-title">Daftar Akun Terdaftar</h2><button class="btn-refresh" id="btn-refresh-admins">Refresh</button></div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead><tr><th>ID Admin</th><th>Nama</th><th>Role</th><th>Telegram Chat ID</th><th>Aksi</th></tr></thead>
+                <tbody id="admin-list-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PANEL -->
+      <div class="admin-panel" id="panel-settings">
+        <div class="admin-page-header"><h1 class="page-title">Pengaturan Akun</h1><p class="page-subtitle">Ubah nama admin dan password panel</p></div>
         <div class="content-area">
           <div class="card" style="max-width: 500px; padding: var(--space-6);">
             <form id="form-settings" style="display: flex; flex-direction: column; gap: var(--space-4);" novalidate>
+              <div class="form-group"><label class="form-label">Nama Admin</label><input type="text" id="setting-name" class="form-input admin-form" required /></div>
               <div class="form-group">
-                <label class="form-label" for="setting-name">Nama Admin</label>
-                <input type="text" id="setting-name" class="form-input admin-form" required
-                  placeholder="Masukkan nama Anda" />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="setting-password">Password Baru</label>
+                <label class="form-label">Password Baru</label>
                 <div class="input-wrapper">
-                  <input type="password" id="setting-password" class="form-input admin-form"
-                    placeholder="Ketik password baru" />
-                  <button type="button" class="input-toggle" id="toggle-setting-pwd"
-                    aria-label="Toggle tampilkan password">
-                    <svg class="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </button>
+                  <input type="password" id="setting-password" class="form-input admin-form" placeholder="Ketik password baru" />
+                  <button type="button" class="input-toggle" id="toggle-setting-pwd">👁</button>
                 </div>
-                <span class="form-hint" style="margin-top:4px;">Kosongkan jika Anda tidak ingin mengubah password saat
-                  ini.</span>
+                <span class="form-hint">Kosongkan jika tidak ingin mengubah password.</span>
               </div>
-
-              <div style="margin-top: var(--space-3);">
-                <button type="submit" class="btn btn-secondary btn-full">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Simpan Pengaturan
-                </button>
-              </div>
+              <button type="submit" class="btn btn-secondary btn-full">Simpan Pengaturan</button>
             </form>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-    </div><!-- .admin-content -->
-  </div><!-- #admin-layout -->
-
-
-  <!-- ══════════════════════════════════════════════════════════════
-     MODALS
-══════════════════════════════════════════════════════════════ -->
-
-  <!-- Edit Modal -->
-  <div class="modal-backdrop" id="modal-edit" role="dialog" aria-modal="true" aria-labelledby="modal-edit-title">
+  <!-- MODALS -->
+  <div class="modal-backdrop" id="modal-edit">
     <div class="modal-box">
-      <div class="modal-header">
-        <div>
-          <h2 class="modal-title" id="modal-edit-title">Edit Data Transaksi</h2>
-          <p id="modal-edit-subtitle" style="font-size:var(--text-sm);color:var(--gray-500);margin-top:3px;">—</p>
-        </div>
-        <button class="modal-close" id="btn-close-edit" aria-label="Tutup modal edit">✕</button>
-      </div>
+      <div class="modal-header"><div><h2 class="modal-title">Edit Data Transaksi</h2><p id="modal-edit-subtitle" style="font-size:var(--text-sm);color:var(--gray-500);">—</p></div><button class="modal-close" id="btn-close-edit">✕</button></div>
       <div class="modal-body">
-        <input type="hidden" id="edit-txn-id" />
-        <input type="hidden" id="edit-row-index" />
-
-        <div class="modal-grid">
-          <div class="form-group" style="grid-column:1/-1;">
-            <label class="form-label" for="edit-pic-name">Nama PIC</label>
-            <input type="text" id="edit-pic-name" class="form-input admin-form" aria-label="Nama PIC" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="edit-checkin">Waktu Check-in</label>
-            <input type="datetime-local" id="edit-checkin" class="form-input admin-form" aria-label="Waktu check-in" />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="edit-checkout">Waktu Check-out</label>
-            <input type="datetime-local" id="edit-checkout" class="form-input admin-form"
-              aria-label="Waktu check-out" />
-          </div>
-          <div class="modal-stepper-group">
-            <span class="form-label">Jumlah Anggota</span>
-            <div class="stepper">
-              <button type="button" class="stepper-btn" id="btn-edit-members-dec"
-                aria-label="Kurangi anggota">−</button>
-              <span class="stepper-value" id="edit-val-members" role="spinbutton" aria-valuemin="0"
-                aria-valuenow="0">0</span>
-              <button type="button" class="stepper-btn" id="btn-edit-members-inc" aria-label="Tambah anggota">+</button>
-            </div>
-          </div>
-          <div class="modal-stepper-group">
-            <span class="form-label">Shuttlecock Baru</span>
-            <div class="stepper">
-              <button type="button" class="stepper-btn" id="btn-edit-shuttle-dec"
-                aria-label="Kurangi shuttlecock">−</button>
-              <span class="stepper-value" id="edit-val-shuttle" role="spinbutton" aria-valuemin="0"
-                aria-valuenow="0">0</span>
-              <button type="button" class="stepper-btn" id="btn-edit-shuttle-inc"
-                aria-label="Tambah shuttlecock">+</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="edit-status">Status</label>
-            <select id="edit-status" class="form-input filter-select" style="height:48px;"
-              aria-label="Status transaksi">
-              <option value="Active">Active</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
-        </div>
+        <input type="hidden" id="edit-txn-id" /><input type="hidden" id="edit-row-index" />
+        <div class="form-group"><label class="form-label">Nama PIC</label><input type="text" id="edit-pic-name" class="form-input admin-form" /></div>
+        <div class="form-group"><label class="form-label">Waktu Check-in</label><input type="datetime-local" id="edit-checkin" class="form-input admin-form" /></div>
+        <div class="form-group"><label class="form-label">Waktu Check-out</label><input type="datetime-local" id="edit-checkout" class="form-input admin-form" /></div>
+        <div class="form-group"><label class="form-label">Status</label><select id="edit-status" class="form-input filter-select" style="height:48px;"><option value="Active">Active</option><option value="Completed">Completed</option></select></div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline btn-md" id="btn-cancel-edit" aria-label="Batal edit">Batal</button>
-        <button class="btn btn-secondary btn-md" id="btn-save-edit" aria-label="Simpan perubahan">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            aria-hidden="true">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-          Simpan Perubahan
-        </button>
-      </div>
+      <div class="modal-footer"><button class="btn btn-outline btn-md" id="btn-cancel-edit">Batal</button><button class="btn btn-secondary btn-md" id="btn-save-edit">Simpan Perubahan</button></div>
     </div>
   </div>
 
-  <!-- Delete Confirm Modal -->
-  <div class="modal-backdrop" id="modal-delete" role="dialog" aria-modal="true" aria-labelledby="modal-delete-title">
-    <div class="modal-box" style="max-width:440px;">
-      <div class="modal-header">
-        <h2 class="modal-title" id="modal-delete-title" style="color:var(--color-error);">🗑 Hapus Transaksi</h2>
-        <button class="modal-close" id="btn-close-delete" aria-label="Tutup modal hapus">✕</button>
-      </div>
-      <div class="modal-body">
-        <p class="text-body-m text-secondary">Anda akan menghapus data berikut:</p>
-        <div class="delete-record-info" id="delete-record-info">—</div>
-        <div class="delete-warning">
-          <span class="delete-warning-icon" aria-hidden="true">⚠️</span>
-          <p class="delete-warning-text">Tindakan ini tidak dapat dibatalkan.</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline btn-md" id="btn-cancel-delete" aria-label="Batal hapus">Batal</button>
-        <button class="btn btn-danger btn-md" id="btn-confirm-delete" aria-label="Konfirmasi hapus data">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            aria-hidden="true">
-            <polyline points="3 6 5 6 21 6" />
-            <path d="M19 6l-1 14H6L5 6" />
-            <path d="M10 11v6" />
-            <path d="M14 11v6" />
-            <path d="M9 6V4h6v2" />
-          </svg>
-          Hapus Data
-        </button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ══════════════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════════════ -->
+  <!-- JAVASCRIPT -->
   <script>
     'use strict';
-
-    /* ── Config ─────────────────────────────────────────────────── */
-    let ADMIN_PASSWORD = localStorage.getItem('admin_pwd') || 'admin123';
-    let ADMIN_NAME = localStorage.getItem('admin_name') || 'Admin';
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI_nrI6IsdoB61ilcg8ho9IO5ehtBcbX33IiJYa4Wufw7TrWqUmm5VKu7VnwZNmIgx/exec'; // Add your Google Apps Script URL here
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI_nrI6IsdoB61ilcg8ho9IO5ehtBcbX33IiJYa4Wufw7TrWqUmm5VKu7VnwZNmIgx/exec';
     const LS_ADMIN_KEY = 'badminton_admin_auth';
     const PAGE_SIZE = 10;
 
-    /* ── State ───────────────────────────────────────────────────── */
     let allData = [];
     let filteredData = [];
     let currentPage = 1;
     let sortKey = 'checkIn';
     let sortDir = 'desc';
-    let editMembers = 0;
-    let editShuttle = 0;
-    let deleteRowIndex = null;
     let liveTimers = {};
 
-    /* ═══════════════════════════════════════════════════════════════
-       TOAST (shared utility)
-    ═══════════════════════════════════════════════════════════════ */
+    let currentAdminRole = sessionStorage.getItem('admin_role') || 'Admin Biasa';
+    let currentAdminName = sessionStorage.getItem('admin_name') || 'Admin';
+
     function showToast(message, type = 'success', duration = 4000) {
       const container = document.getElementById('toast-container');
       const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
-      toast.setAttribute('role', 'alert');
       toast.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${message}</span>`;
       container.appendChild(toast);
       const dismiss = () => { toast.classList.add('toast-out'); setTimeout(() => toast.remove(), 300); };
@@ -1733,81 +459,28 @@
       setTimeout(dismiss, duration);
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       OFFLINE
-    ═══════════════════════════════════════════════════════════════ */
-    const offlineBanner = document.getElementById('offline-banner');
-    window.addEventListener('offline', () => offlineBanner.classList.add('visible'));
-    window.addEventListener('online', () => offlineBanner.classList.remove('visible'));
-    if (!navigator.onLine) offlineBanner.classList.add('visible');
-
-    /* ═══════════════════════════════════════════════════════════════
-       SCREEN MANAGEMENT
-    ═══════════════════════════════════════════════════════════════ */
-    function showLogin() {
-      document.getElementById('screen-login').classList.add('active');
-      document.getElementById('admin-layout').classList.remove('active');
-    }
-
-    function showAdmin() {
-      document.getElementById('screen-login').classList.remove('active');
-      document.getElementById('admin-layout').classList.add('active');
-      initDashboard();
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-   SCREEN MANAGEMENT
-═══════════════════════════════════════════════════════════════ */
-// Ubah fungsi menjadi async agar bisa menunggu (await) data dari server
-async function switchPanel(name) {
-  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  document.querySelectorAll('.drawer-nav-link').forEach(l => l.classList.remove('active'));
-
-  const panel = document.getElementById(`panel-${name}`);
-  const navBtn = document.getElementById(`nav-${name}`);
-  if (panel) panel.classList.add('active');
-  if (navBtn) navBtn.classList.add('active');
-
-  // Drawer
-  document.querySelectorAll(`[data-drawer-nav="${name}"]`).forEach(el => el.classList.add('active'));
-
-  // Tambahkan logika fetch data otomatis saat membuka Log Data
-  if (name === 'log') { 
-    // Beri indikator visual bahwa data sedang dimuat
-    document.getElementById('table-info').textContent = 'Memuat data terbaru...';
-    
-    // Tarik data terbaru dari Google Sheets
-    allData = await fetchData();
-    filteredData = [...allData];
-    
-    // Perbarui filter dan render ulang tabel
-    populateCourtFilter();
-    applyFilters(); // ✅ GANTI renderLogTable() menjadi applyFilters()
-  }
-}
-
-    /* ═══════════════════════════════════════════════════════════════
-       LOGIN
-    ═══════════════════════════════════════════════════════════════ */
-    // Check existing auth
+    // Auth Session check
     if (sessionStorage.getItem(LS_ADMIN_KEY) === 'true') {
       document.getElementById('screen-login').classList.remove('active');
       document.getElementById('admin-layout').classList.add('active');
+      applyRolePermissions();
     }
 
-    // Password toggle
-    document.getElementById('toggle-password').addEventListener('click', function () {
-      const input = document.getElementById('admin-password');
-      const isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      this.setAttribute('aria-label', isPassword ? 'Sembunyikan password' : 'Tampilkan password');
-      document.getElementById('eye-icon').innerHTML = isPassword
-        ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    });
+    function applyRolePermissions() {
+      const adminMgmtNav = document.getElementById('nav-admin-mgmt');
+      const drawerAdminMgmt = document.getElementById('drawer-nav-admin-mgmt');
+      if (currentAdminRole === 'Administrator') {
+        if (adminMgmtNav) adminMgmtNav.style.display = 'flex';
+        if (drawerAdminMgmt) drawerAdminMgmt.style.display = 'flex';
+      } else {
+        if (adminMgmtNav) adminMgmtNav.style.display = 'none';
+        if (drawerAdminMgmt) drawerAdminMgmt.style.display = 'none';
+      }
+      document.getElementById('admin-greeting-text').textContent = `Halo, ${currentAdminName} (${currentAdminRole})`;
+      document.getElementById('setting-name').value = currentAdminName;
+    }
 
-    // Login form
+    // Login Form Handler (Fetch dinamis ke tab Data_Admin)
     document.getElementById('form-login').addEventListener('submit', async function (e) {
       e.preventDefault();
       const password = document.getElementById('admin-password').value;
@@ -1815,282 +488,169 @@ async function switchPanel(name) {
       const errorEl = document.getElementById('login-error');
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="btn-spinner"></span> Memverifikasi...';
+      btn.innerHTML = 'Memverifikasi...';
       errorEl.classList.remove('visible');
 
-      // Simulate network delay
-      await new Promise(r => setTimeout(r, 600));
+      try {
+        const res = await fetch(`${GAS_URL}?action=get_admins`, { redirect: 'follow' });
+        const json = await res.json();
+        const admins = json.data || [];
 
-      if (password === ADMIN_PASSWORD) {
-        sessionStorage.setItem(LS_ADMIN_KEY, 'true');
-        showAdmin();
-        showToast('Selamat datang di Admin Panel! 🎉', 'success');
-      } else {
-        errorEl.classList.add('visible');
-        document.getElementById('admin-password').value = '';
-        document.getElementById('admin-password').focus();
+        // Fallback jika sheet kosong/belum terinisialisasi
+        let matchedAdmin = admins.find(a => String(a.password) === String(password));
+        if (!matchedAdmin && password === 'admin123') {
+          matchedAdmin = { namaAdmin: 'Administrator Utama', role: 'Administrator' };
+        }
+
+        if (matchedAdmin) {
+          sessionStorage.setItem(LS_ADMIN_KEY, 'true');
+          sessionStorage.setItem('admin_role', matchedAdmin.role);
+          sessionStorage.setItem('admin_name', matchedAdmin.namaAdmin);
+          currentAdminRole = matchedAdmin.role;
+          currentAdminName = matchedAdmin.namaAdmin;
+
+          document.getElementById('screen-login').classList.remove('active');
+          document.getElementById('admin-layout').classList.add('active');
+          applyRolePermissions();
+          initDashboard();
+          showToast(`Selamat datang, ${matchedAdmin.namaAdmin}! 🎉`, 'success');
+        } else {
+          errorEl.classList.add('visible');
+          document.getElementById('admin-password').value = '';
+        }
+      } catch (err) {
+        // Offline / fallback ke password default lokal jika gagal koneksi
+        if (password === 'admin123') {
+          sessionStorage.setItem(LS_ADMIN_KEY, 'true');
+          sessionStorage.setItem('admin_role', 'Administrator');
+          sessionStorage.setItem('admin_name', 'Administrator Utama');
+          currentAdminRole = 'Administrator';
+          currentAdminName = 'Administrator Utama';
+          document.getElementById('screen-login').classList.remove('active');
+          document.getElementById('admin-layout').classList.add('active');
+          applyRolePermissions();
+          initDashboard();
+          showToast('Login Offline Berhasil', 'warning');
+        } else {
+          errorEl.classList.add('visible');
+        }
       }
-
       btn.disabled = false;
-      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Masuk ke Panel';
+      btn.innerHTML = 'Masuk ke Panel';
     });
 
-    // Logout
     function doLogout() {
-      sessionStorage.removeItem(LS_ADMIN_KEY);
-      // Clear live timers
-      Object.values(liveTimers).forEach(clearInterval);
-      liveTimers = {};
-      showLogin();
+      sessionStorage.clear();
+      location.reload();
     }
     document.getElementById('btn-logout').addEventListener('click', doLogout);
     document.getElementById('btn-drawer-logout').addEventListener('click', doLogout);
 
-    /* ═══════════════════════════════════════════════════════════════
-       NAVBAR
-    ═══════════════════════════════════════════════════════════════ */
+    // Navigation Switches
+    function switchPanel(name) {
+      if (name === 'admin-mgmt' && currentAdminRole !== 'Administrator') {
+        showToast('Akses ditolak. Khusus Administrator.', 'error');
+        return;
+      }
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      
+      const panel = document.getElementById(`panel-${name}`);
+      const navBtn = document.getElementById(`nav-${name}`);
+      if (panel) panel.classList.add('active');
+      if (navBtn) navBtn.classList.add('active');
+
+      if (name === 'log') { fetchAndRenderLog(); }
+      if (name === 'admin-mgmt') { fetchAndRenderAdmins(); }
+    }
+
     document.getElementById('nav-dashboard').addEventListener('click', () => switchPanel('dashboard'));
     document.getElementById('nav-log').addEventListener('click', () => switchPanel('log'));
+    document.getElementById('nav-qr').addEventListener('click', () => switchPanel('qr'));
+    document.getElementById('nav-admin-mgmt').addEventListener('click', () => switchPanel('admin-mgmt'));
+    document.getElementById('nav-settings').addEventListener('click', () => switchPanel('settings'));
 
-    // Hamburger
-    const hamburgerBtn = document.getElementById('btn-hamburger');
-    const drawerOverlay = document.getElementById('drawer-overlay');
-    const mobileDrawer = document.getElementById('mobile-drawer');
-
-    function openDrawer() {
-      drawerOverlay.classList.add('active');
-      mobileDrawer.classList.add('active');
-      hamburgerBtn.setAttribute('aria-expanded', 'true');
-      drawerOverlay.setAttribute('aria-hidden', 'false');
-    }
-    function closeDrawer() {
-      drawerOverlay.classList.remove('active');
-      mobileDrawer.classList.remove('active');
-      hamburgerBtn.setAttribute('aria-expanded', 'false');
-      drawerOverlay.setAttribute('aria-hidden', 'true');
-    }
-
-    hamburgerBtn.addEventListener('click', openDrawer);
-    document.getElementById('btn-drawer-close').addEventListener('click', closeDrawer);
-    drawerOverlay.addEventListener('click', closeDrawer);
-
-    // Drawer nav links
+    // Drawer navigation
     document.querySelectorAll('[data-drawer-nav]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const panel = btn.dataset.drawerNav;
-        switchPanel(panel);
-        closeDrawer();
+        switchPanel(btn.dataset.drawerNav);
+        document.getElementById('drawer-overlay').classList.remove('active');
+        document.getElementById('mobile-drawer').classList.remove('active');
       });
     });
 
-    /* ═══════════════════════════════════════════════════════════════
-       MOCK DATA GENERATOR
-    ═══════════════════════════════════════════════════════════════ */
-    function generateMockData() {
-      const courts = ['COURT-A', 'COURT-B', 'COURT-C', 'COURT-D'];
-      const names = ['Rizky Pratama', 'Sandi Hermawan', 'Meli Andriani', 'Dito Kurniawan',
-        'Budi Santoso', 'Dewi Rahayu', 'Andi Wijaya', 'Sinta Purnama',
-        'Fajar Nugroho', 'Rina Susanti', 'Hendra Gunawan', 'Maya Sari'];
+    document.getElementById('btn-hamburger').addEventListener('click', () => {
+      document.getElementById('drawer-overlay').classList.add('active');
+      document.getElementById('mobile-drawer').classList.add('active');
+    });
+    document.getElementById('btn-drawer-close').addEventListener('click', () => {
+      document.getElementById('drawer-overlay').classList.remove('active');
+      document.getElementById('mobile-drawer').classList.remove('active');
+    });
 
-      const now = Date.now();
-      const dayStart = new Date(); dayStart.setHours(7, 0, 0, 0);
-      const data = [];
-
-      // Completed sessions
-      for (let i = 0; i < 14; i++) {
-        const checkIn = dayStart.getTime() + i * 45 * 60000 + Math.random() * 15 * 60000;
-        const duration = (60 + Math.random() * 60) * 60000;
-        const checkOut = checkIn + duration;
-        if (checkOut > now) continue;
-
-        data.push({
-          txnId: `TXN-${String(i + 1).padStart(3, '0')}`,
-          courtId: courts[i % courts.length],
-          picName: names[i % names.length],
-          checkIn: checkIn,
-          checkOut: checkOut,
-          members: Math.floor(2 + Math.random() * 6),
-          shuttle: Math.floor(Math.random() * 4),
-          status: 'Completed',
-        });
-      }
-
-      // Active sessions
-      const activeCourts = courts.slice(0, 3);
-      activeCourts.forEach((court, i) => {
-        const checkIn = now - (30 + i * 20 + Math.random() * 30) * 60000;
-        data.push({
-          txnId: `TXN-${String(data.length + 1).padStart(3, '0')}`,
-          courtId: court,
-          picName: names[names.length - 1 - i],
-          checkIn: checkIn,
-          checkOut: null,
-          members: null,
-          shuttle: null,
-          status: 'Active',
-        });
-      });
-
-      return data.sort((a, b) => b.checkIn - a.checkIn);
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       DATA FETCHING
-    ═══════════════════════════════════════════════════════════════ */
     async function fetchData() {
-      if (GAS_URL) {
-        try {
-          const res = await fetch(GAS_URL, { redirect: 'follow' });
-          const json = await res.json();
-          return json.data || [];
-        } catch (err) {
-          console.error('Fetch error:', err);
-          showToast('Gagal memuat data dari server. Menggunakan data demo.', 'warning');
-          return generateMockData();
-        }
+      try {
+        const res = await fetch(GAS_URL, { redirect: 'follow' });
+        const json = await res.json();
+        return json.data || [];
+      } catch (err) {
+        showToast('Gagal memuat data dari server.', 'warning');
+        return [];
       }
-      // Demo mode
-      await new Promise(r => setTimeout(r, 400));
-      return generateMockData();
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       DASHBOARD INIT
-    ═══════════════════════════════════════════════════════════════ */
     async function initDashboard() {
-      // Date display
       const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('current-date-display').textContent = now.toLocaleDateString('id-ID', options);
-
+      document.getElementById('current-date-display').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       allData = await fetchData();
       filteredData = [...allData];
-
-      populateCourtFilter();
       updateSummaryCards();
       updateLiveCourts();
-
-      // Animate cards
-      document.querySelectorAll('.summary-card').forEach(card => {
-        card.classList.add('animate-in');
-      });
     }
 
     function updateSummaryCards() {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const todayTs = today.getTime();
-
       const todayData = allData.filter(d => d.checkIn >= todayTs);
-      const totalSessions = todayData.length;
-      const activeSessions = todayData.filter(d => d.status === 'Active').length;
-      const totalPlayers = todayData.filter(d => d.members).reduce((s, d) => s + (d.members || 0), 0);
-      const totalShuttle = todayData.filter(d => d.shuttle != null).reduce((s, d) => s + (d.shuttle || 0), 0);
-
-      animateCounter('metric-total-sessions', totalSessions);
-      animateCounter('metric-active-sessions', activeSessions);
-      animateCounter('metric-total-players', totalPlayers);
-      animateCounter('metric-shuttlecock', totalShuttle);
-
-      document.getElementById('trend-sessions').textContent = totalSessions > 0 ? `+${totalSessions} hari ini` : '';
-      document.getElementById('trend-active').textContent = activeSessions > 0 ? `${activeSessions} lapangan live` : 'Tidak ada sesi aktif';
-    }
-
-    function animateCounter(id, targetValue) {
-      const el = document.getElementById(id);
-      const duration = 600;
-      const start = 0;
-      const startTime = performance.now();
-
-      const update = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(start + (targetValue - start) * eased);
-        if (progress < 1) requestAnimationFrame(update);
-      };
-      requestAnimationFrame(update);
+      
+      document.getElementById('metric-total-sessions').textContent = todayData.length;
+      document.getElementById('metric-active-sessions').textContent = todayData.filter(d => d.status === 'Active').length;
+      document.getElementById('metric-total-players').textContent = todayData.filter(d => d.members).reduce((s, d) => s + (d.members || 0), 0);
+      document.getElementById('metric-shuttlecock').textContent = todayData.filter(d => d.shuttle != null).reduce((s, d) => s + (d.shuttle || 0), 0);
     }
 
     function updateLiveCourts() {
       const activeSessions = allData.filter(d => d.status === 'Active');
       const tbody = document.getElementById('live-courts-body');
-
-      // Clear old timers
-      Object.values(liveTimers).forEach(clearInterval);
-      liveTimers = {};
-
       if (activeSessions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🏟️</div><p>Tidak ada lapangan aktif saat ini</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">🏟️</div><p>Tidak ada lapangan aktif saat ini</p></div></td></tr>`;
         return;
       }
-
       tbody.innerHTML = activeSessions.map(s => `
-    <tr>
-      <td>
-        <span class="court-live-badge">
-          <span class="live-dot" aria-hidden="true" style="background:#991B1B;"></span>
-          ${escapeHtml(s.courtId)}
-        </span>
-      </td>
-      <td><strong>${escapeHtml(s.picName)}</strong></td>
-      <td>${formatTime(s.checkIn)}</td>
-      <td class="live-duration" id="live-dur-${s.txnId}" aria-label="Durasi live">—</td>
-      <td><span class="txn-id">${escapeHtml(s.txnId)}</span></td>
-    </tr>
-  `).join('');
-
-      activeSessions.forEach(s => {
-        const el = document.getElementById(`live-dur-${s.txnId}`);
-        const update = () => {
-          const ms = Date.now() - s.checkIn;
-          el.textContent = formatDuration(ms);
-        };
-        update();
-        liveTimers[s.txnId] = setInterval(update, 1000);
-      });
+        <tr>
+          <td><span class="court-live-badge"><span class="live-dot" style="background:#991B1B;"></span>${s.courtId}</span></td>
+          <td><strong>${s.picName}</strong></td>
+          <td>${new Date(s.checkIn).toLocaleTimeString('id-ID')} WIB</td>
+          <td class="live-duration">Live</td>
+          <td><span class="txn-id">${s.txnId}</span></td>
+        </tr>
+      `).join('');
     }
 
-    /* ── Refresh button ────────────────────────────────────────── */
-    document.getElementById('btn-refresh-dashboard').addEventListener('click', async function () {
+    document.getElementById('btn-refresh-dashboard').addEventListener('click', async function() {
       this.classList.add('spinning');
       allData = await fetchData();
-      filteredData = [...allData];
       updateSummaryCards();
       updateLiveCourts();
       setTimeout(() => this.classList.remove('spinning'), 800);
-      showToast('Data berhasil diperbarui', 'success', 2000);
+      showToast('Dashboard diperbarui', 'success');
     });
 
-    /* ═══════════════════════════════════════════════════════════════
-       LOG TABLE
-    ═══════════════════════════════════════════════════════════════ */
-    function populateCourtFilter() {
-      const courts = [...new Set(allData.map(d => d.courtId))].sort();
-      const select = document.getElementById('filter-court');
-      const currentVal = select.value;
-      select.innerHTML = '<option value="">Semua Lapangan</option>' +
-        courts.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-      select.value = currentVal;
-    }
-
-    function applyFilters() {
-     // Filter events
-document.getElementById('search-log').addEventListener('input', () => { currentPage = 1; applyFilters(); });
-document.getElementById('filter-status').addEventListener('change', () => { currentPage = 1; applyFilters(); });
-document.getElementById('filter-court').addEventListener('change', () => { currentPage = 1; applyFilters(); });
-
-// Sort
-document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
-  th.addEventListener('click', () => {
-    const key = th.dataset.sort;
-    if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-    else { sortKey = key; sortDir = 'desc'; }
-    document.querySelectorAll('.data-table th').forEach(h => h.classList.remove('sorted'));
-    th.classList.add('sorted');
-    currentPage = 1;
-    applyFilters(); // <--- Ubah di sini
-  });
-});
+    async function fetchAndRenderLog() {
+      document.getElementById('table-info').textContent = 'Memuat data...';
+      allData = await fetchData();
+      filteredData = [...allData];
+      renderLogTable();
     }
 
     function renderLogTable() {
@@ -2101,368 +661,107 @@ document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
       const page = filteredData.slice(start, end);
 
       if (page.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-state-icon" aria-hidden="true">🔍</div><p>Tidak ada data yang cocok</p></div></td></tr>`;
-        document.getElementById('table-info').textContent = 'Tidak ada data';
-        document.getElementById('pagination').innerHTML = '';
+        tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><p>Tidak ada data</p></div></td></tr>`;
         return;
       }
 
-      tbody.innerHTML = page.map((d, i) => {
-        const globalIdx = start + i + 1;
-        const statusClass = d.status === 'Active' ? 'status-active' : 'status-completed';
-        const statusIcon = d.status === 'Active' ? '●' : '✓';
-        return `
-      <tr>
-        <td style="color:var(--gray-500);">${globalIdx}</td>
-        <td><span class="txn-id">${escapeHtml(d.txnId)}</span></td>
-        <td><strong>${escapeHtml(d.courtId)}</strong></td>
-        <td>${escapeHtml(d.picName)}</td>
-        <td>${formatTime(d.checkIn)}</td>
-        <td>${d.checkOut ? formatTime(d.checkOut) : '<span style="color:var(--gray-400);">—</span>'}</td>
-        <td>${d.members != null ? d.members : '<span style="color:var(--gray-400);">—</span>'}</td>
-        <td>${d.shuttle != null ? d.shuttle : '<span style="color:var(--gray-400);">—</span>'}</td>
-        <td><span class="status-badge ${statusClass}">${statusIcon} ${d.status === 'Active' ? 'Aktif' : 'Selesai'}</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="action-btn edit" data-idx="${start + i}" aria-label="Edit data ${escapeHtml(d.txnId)}" title="Edit">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>
-            <button class="action-btn delete" data-idx="${start + i}" aria-label="Hapus data ${escapeHtml(d.txnId)}" title="Hapus">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-      }).join('');
-
-      // Info
+      tbody.innerHTML = page.map((d, i) => `
+        <tr>
+          <td>${start + i + 1}</td>
+          <td><span class="txn-id">${d.txnId}</span></td>
+          <td><strong>${d.courtId}</strong></td>
+          <td>${d.picName}</td>
+          <td>${new Date(d.checkIn).toLocaleTimeString('id-ID')}</td>
+          <td>${d.checkOut ? new Date(d.checkOut).toLocaleTimeString('id-ID') : '—'}</td>
+          <td>${d.members ?? '—'}</td>
+          <td>${d.shuttle ?? '—'}</td>
+          <td><span class="status-badge ${d.status === 'Active' ? 'status-active' : 'status-completed'}">${d.status}</span></td>
+          <td>
+            <button class="action-btn edit" onclick="openEditModal('${d.txnId}')">✏️</button>
+            <button class="action-btn delete" onclick="deleteTxn('${d.txnId}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
       document.getElementById('table-info').textContent = `Menampilkan ${start + 1}–${end} dari ${total} entri`;
-
-      // Pagination
-      renderPagination(total);
-
-      // Bind action buttons
-      tbody.querySelectorAll('.action-btn.edit').forEach(btn => {
-        btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.idx)));
-      });
-      tbody.querySelectorAll('.action-btn.delete').forEach(btn => {
-        btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.idx)));
-      });
     }
 
-    function renderPagination(total) {
-      const totalPages = Math.ceil(total / PAGE_SIZE);
-      const container = document.getElementById('pagination');
-      if (totalPages <= 1) { container.innerHTML = ''; return; }
+    // Manajemen Admin Table Renderer & Form Handler
+    async function fetchAndRenderAdmins() {
+      const tbody = document.getElementById('admin-list-body');
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Memuat data admin...</td></tr>`;
+      try {
+        const res = await fetch(`${GAS_URL}?action=get_admins`, { redirect: 'follow' });
+        const json = await res.json();
+        const admins = json.data || [];
 
-      let html = '';
-      html += `<button class="page-btn" id="pg-prev" aria-label="Halaman sebelumnya" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
-
-      for (let p = 1; p <= totalPages; p++) {
-        if (p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1) {
-          html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}" aria-label="Halaman ${p}" aria-current="${p === currentPage ? 'page' : 'false'}">${p}</button>`;
-        } else if (Math.abs(p - currentPage) === 2) {
-          html += `<span style="color:var(--gray-400);display:flex;align-items:center;padding:0 4px;">…</span>`;
-        }
+        tbody.innerHTML = admins.map(a => `
+          <tr>
+            <td><span class="txn-id">${a.idAdmin}</span></td>
+            <td><strong>${a.namaAdmin}</strong></td>
+            <td><span class="status-badge ${a.role === 'Administrator' ? 'status-active' : 'status-completed'}">${a.role}</span></td>
+            <td>${a.telegramChatId || '—'}</td>
+            <td>${a.idAdmin !== 'ADM-001' ? `<button class="action-btn delete" onclick="deleteAdmin('${a.idAdmin}')">🗑️</button>` : 'System Default'}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Gagal memuat daftar admin</td></tr>`;
       }
-      html += `<button class="page-btn" id="pg-next" aria-label="Halaman berikutnya" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
-
-      container.innerHTML = html;
-
-      container.querySelector('#pg-prev')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderLogTable(); } });
-      container.querySelector('#pg-next')?.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; renderLogTable(); } });
-      container.querySelectorAll('[data-page]').forEach(btn => {
-        btn.addEventListener('click', () => { currentPage = parseInt(btn.dataset.page); renderLogTable(); });
-      });
     }
 
-    // Filter events
-    document.getElementById('search-log').addEventListener('input', () => { currentPage = 1; renderLogTable(); });
-    document.getElementById('filter-status').addEventListener('change', () => { currentPage = 1; renderLogTable(); });
-    document.getElementById('filter-court').addEventListener('change', () => { currentPage = 1; renderLogTable(); });
+    document.getElementById('form-add-admin').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const nama = document.getElementById('new-admin-name').value.trim();
+      const pwd = document.getElementById('new-admin-pwd').value;
+      const chatId = document.getElementById('new-admin-chatid').value.trim();
+      const role = document.getElementById('new-admin-role').value;
 
-    // Sort
-    document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
-      th.addEventListener('click', () => {
-        const key = th.dataset.sort;
-        if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-        else { sortKey = key; sortDir = 'desc'; }
-        document.querySelectorAll('.data-table th').forEach(h => h.classList.remove('sorted'));
-        th.classList.add('sorted');
-        currentPage = 1;
-        renderLogTable();
-      });
+      if (!nama || !pwd) { showToast('Nama dan password wajib diisi', 'error'); return; }
+
+      const btn = document.getElementById('btn-submit-admin');
+      btn.disabled = true;
+      btn.innerHTML = 'Menambahkan...';
+
+      try {
+        const fd = new URLSearchParams({ action: 'add_admin', nama_admin: nama, password: pwd, role: role, telegram_chat_id: chatId });
+        await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+        showToast('Admin baru berhasil ditambahkan!', 'success');
+        document.getElementById('form-add-admin').reset();
+        fetchAndRenderAdmins();
+      } catch (err) {
+        showToast('Gagal menambahkan admin', 'error');
+      }
+      btn.disabled = false;
+      btn.innerHTML = 'Tambah Akun Admin';
     });
 
-    /* ═══════════════════════════════════════════════════════════════
-       EDIT MODAL
-    ═══════════════════════════════════════════════════════════════ */
-    function openEditModal(idx) {
-      const d = filteredData[idx];
-      if (!d) return;
-
-      document.getElementById('modal-edit-subtitle').textContent = `${d.txnId} — ${d.courtId}`;
-      document.getElementById('edit-txn-id').value = d.txnId;
-      document.getElementById('edit-row-index').value = idx;
-      document.getElementById('edit-pic-name').value = d.picName;
-      document.getElementById('edit-checkin').value = toDatetimeLocal(d.checkIn);
-      document.getElementById('edit-checkout').value = d.checkOut ? toDatetimeLocal(d.checkOut) : '';
-      document.getElementById('edit-status').value = d.status;
-
-      editMembers = d.members || 0;
-      editShuttle = d.shuttle || 0;
-      updateEditStepper('members', editMembers);
-      updateEditStepper('shuttle', editShuttle);
-
-      document.getElementById('modal-edit').classList.add('active');
-    }
-
-    function updateEditStepper(type, val) {
-      if (type === 'members') {
-        document.getElementById('edit-val-members').textContent = val;
-        document.getElementById('edit-val-members').setAttribute('aria-valuenow', val);
-        document.getElementById('btn-edit-members-dec').disabled = val <= 0;
-      } else {
-        document.getElementById('edit-val-shuttle').textContent = val;
-        document.getElementById('edit-val-shuttle').setAttribute('aria-valuenow', val);
-        document.getElementById('btn-edit-shuttle-dec').disabled = val <= 0;
+    window.deleteAdmin = async function(idAdmin) {
+      if (!confirm('Yakin ingin menghapus akses admin ini?')) return;
+      try {
+        const fd = new URLSearchParams({ action: 'delete_admin', id_admin: idAdmin });
+        await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+        showToast('Admin berhasil dihapus', 'info');
+        fetchAndRenderAdmins();
+      } catch (err) {
+        showToast('Gagal menghapus admin', 'error');
       }
-    }
+    };
 
-    document.getElementById('btn-edit-members-inc').addEventListener('click', () => { editMembers++; updateEditStepper('members', editMembers); });
-    document.getElementById('btn-edit-members-dec').addEventListener('click', () => { if (editMembers > 0) { editMembers--; updateEditStepper('members', editMembers); } });
-    document.getElementById('btn-edit-shuttle-inc').addEventListener('click', () => { editShuttle++; updateEditStepper('shuttle', editShuttle); });
-    document.getElementById('btn-edit-shuttle-dec').addEventListener('click', () => { if (editShuttle > 0) { editShuttle--; updateEditStepper('shuttle', editShuttle); } });
-
-    function closeEditModal() { document.getElementById('modal-edit').classList.remove('active'); }
-    document.getElementById('btn-close-edit').addEventListener('click', closeEditModal);
-    document.getElementById('btn-cancel-edit').addEventListener('click', closeEditModal);
-    document.getElementById('modal-edit').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
-
-    document.getElementById('btn-save-edit').addEventListener('click', async function () {
-      const idx = parseInt(document.getElementById('edit-row-index').value);
-      const txnId = document.getElementById('edit-txn-id').value;
-      const picName = document.getElementById('edit-pic-name').value.trim();
-      const checkIn = document.getElementById('edit-checkin').value;
-      const checkOut = document.getElementById('edit-checkout').value;
-      const status = document.getElementById('edit-status').value;
-
-      if (!picName) { showToast('Nama PIC tidak boleh kosong', 'error'); return; }
-
-      this.disabled = true;
-      this.innerHTML = '<span class="btn-spinner"></span> Menyimpan...';
-
-      await new Promise(r => setTimeout(r, 600));
-
-      if (GAS_URL) {
-        try {
-          const fd = new URLSearchParams({ action: 'admin_update', id_transaksi: txnId, nama_pic: picName, waktu_checkin: checkIn, waktu_checkout: checkOut, jumlah_anggota: editMembers, shuttlecock_terpakai: editShuttle, status });
-          await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
-        } catch { }
-      }
-
-      // Update local data
-      const dataIdx = allData.findIndex(d => d.txnId === txnId);
-      if (dataIdx !== -1) {
-        allData[dataIdx].picName = picName;
-        allData[dataIdx].checkIn = new Date(checkIn).getTime();
-        allData[dataIdx].checkOut = checkOut ? new Date(checkOut).getTime() : null;
-        allData[dataIdx].members = editMembers;
-        allData[dataIdx].shuttle = editShuttle;
-        allData[dataIdx].status = status;
-      }
-
-      closeEditModal();
-      renderLogTable();
-      updateSummaryCards();
-      showToast(`Data ${txnId} berhasil diperbarui`, 'success');
-
-      this.disabled = false;
-      this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Simpan Perubahan';
+    // QR Code Generator
+    document.getElementById('nav-qr').addEventListener('click', () => switchPanel('qr'));
+    document.getElementById('btn-generate-qr').addEventListener('click', () => {
+      const courtId = document.getElementById('qr-court-id').value.trim().toUpperCase();
+      if (!courtId) { showToast('ID Lapangan kosong', 'error'); return; }
+      const container = document.getElementById('qrcode-display');
+      container.innerHTML = '';
+      document.getElementById('print-court-name').textContent = courtId;
+      new QRCode(container, { text: courtId, width: 240, height: 240 });
+      document.getElementById('print-section').style.display = 'block';
     });
+    document.getElementById('btn-print-qr').addEventListener('click', () => window.print());
 
-    /* ═══════════════════════════════════════════════════════════════
-       DELETE MODAL
-    ═══════════════════════════════════════════════════════════════ */
-    function openDeleteModal(idx) {
-      const d = filteredData[idx];
-      if (!d) return;
-      deleteRowIndex = idx;
-      document.getElementById('delete-record-info').textContent =
-        `${d.txnId} | ${d.courtId} | ${d.picName} | ${formatTime(d.checkIn)}`;
-      document.getElementById('modal-delete').classList.add('active');
-    }
-
-    function closeDeleteModal() { document.getElementById('modal-delete').classList.remove('active'); deleteRowIndex = null; }
-    document.getElementById('btn-close-delete').addEventListener('click', closeDeleteModal);
-    document.getElementById('btn-cancel-delete').addEventListener('click', closeDeleteModal);
-    document.getElementById('modal-delete').addEventListener('click', e => { if (e.target === e.currentTarget) closeDeleteModal(); });
-
-    document.getElementById('btn-confirm-delete').addEventListener('click', async function () {
-      if (deleteRowIndex === null) return;
-      const d = filteredData[deleteRowIndex];
-      if (!d) return;
-
-      this.disabled = true;
-      this.innerHTML = '<span class="btn-spinner"></span> Menghapus...';
-
-      await new Promise(r => setTimeout(r, 600));
-
-      if (GAS_URL) {
-        try {
-          const fd = new URLSearchParams({ action: 'admin_delete', id_transaksi: d.txnId });
-          await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
-        } catch { }
-      }
-
-      allData = allData.filter(item => item.txnId !== d.txnId);
-      populateCourtFilter();
-      closeDeleteModal();
-      renderLogTable();
-      updateSummaryCards();
-      updateLiveCourts();
-      showToast(`Data ${d.txnId} berhasil dihapus`, 'info');
-
-      this.disabled = false;
-      this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Hapus Data';
-    });
-
-    /* ── Keyboard: Close modals on Escape ──────────────────────── */
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        closeEditModal();
-        closeDeleteModal();
-        closeDrawer();
-      }
-    });
-
-    /* ═══════════════════════════════════════════════════════════════
-       UTILITY FUNCTIONS
-    ═══════════════════════════════════════════════════════════════ */
-    function formatDuration(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const h = Math.floor(totalSeconds / 3600);
-      const m = Math.floor((totalSeconds % 3600) / 60);
-      const s = totalSeconds % 60;
-      return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
-    }
-
-    function formatTime(timestamp) {
-      if (!timestamp) return '—';
-      const d = new Date(timestamp);
-      return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
-    }
-
-    function toDatetimeLocal(timestamp) {
-      const d = new Date(timestamp);
-      const pad = v => String(v).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    /* ═══════════════════════════════════════════════════════════════
-       INIT (if already authenticated)
-    ═══════════════════════════════════════════════════════════════ */
     if (sessionStorage.getItem(LS_ADMIN_KEY) === 'true') {
       initDashboard();
     }
-    /* ═══════════════════════════════════════════════════════════════
-   QR CODE GENERATOR & PRINT
-═══════════════════════════════════════════════════════════════ */
-    // Tambahkan event listener untuk menu Nav
-    document.getElementById('nav-qr').addEventListener('click', () => switchPanel('qr'));
-
-    let qrCodeInstance = null;
-
-    document.getElementById('btn-generate-qr').addEventListener('click', () => {
-      const courtId = document.getElementById('qr-court-id').value.trim().toUpperCase();
-
-      if (!courtId) {
-        showToast('ID Lapangan tidak boleh kosong', 'error');
-        document.getElementById('qr-court-id').focus();
-        return;
-      }
-
-      const printSection = document.getElementById('print-section');
-      const qrContainer = document.getElementById('qrcode-display');
-      const title = document.getElementById('print-court-name');
-
-      // Bersihkan QR lama jika ada
-      qrContainer.innerHTML = '';
-      title.textContent = courtId;
-
-      // Render QR Code baru
-      qrCodeInstance = new QRCode(qrContainer, {
-        text: courtId,
-        width: 240,
-        height: 240,
-        colorDark: "#111827", // Gray-900 untuk kontras tinggi
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H // High error correction
-      });
-
-      // Tampilkan card preview
-      printSection.style.display = 'block';
-      showToast('QR Code berhasil dibuat!', 'success');
-    });
-
-    // Aksi Cetak
-    document.getElementById('btn-print-qr').addEventListener('click', () => {
-      window.print();
-    });
-    /* ═══════════════════════════════════════════════════════════════
-   SETTINGS LOGIC (NAMA & PASSWORD)
-═══════════════════════════════════════════════════════════════ */
-    // Tambahkan listener untuk menu navigasi
-    document.getElementById('nav-settings').addEventListener('click', () => switchPanel('settings'));
-
-    // Inisialisasi data saat masuk
-    function initSettingsUI() {
-      document.getElementById('admin-greeting-text').textContent = `Halo, ${ADMIN_NAME}`;
-      document.getElementById('setting-name').value = ADMIN_NAME;
-    }
-    initSettingsUI(); // Panggil saat web diload
-
-    // Toggle intip password di menu pengaturan
-    document.getElementById('toggle-setting-pwd').addEventListener('click', function () {
-      const input = document.getElementById('setting-password');
-      const isPassword = input.type === 'password';
-      input.type = isPassword ? 'text' : 'password';
-      this.querySelector('svg').innerHTML = isPassword
-        ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
-        : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-    });
-
-    // Simpan data pengaturan
-    document.getElementById('form-settings').addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const newName = document.getElementById('setting-name').value.trim();
-      const newPwd = document.getElementById('setting-password').value;
-
-      if (newName) {
-        ADMIN_NAME = newName;
-        localStorage.setItem('admin_name', newName);
-      }
-
-      if (newPwd) {
-        if (newPwd.length < 5) {
-          showToast('Password terlalu pendek (minimal 5 karakter)', 'error');
-          return;
-        }
-        ADMIN_PASSWORD = newPwd;
-        localStorage.setItem('admin_pwd', newPwd);
-        document.getElementById('setting-password').value = ''; // Kosongkan kembali
-      }
-
-      initSettingsUI(); // Refresh header sapaan
-      showToast('Pengaturan berhasil disimpan!', 'success');
-    });
   </script>
 </body>
 </html>
