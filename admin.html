@@ -181,7 +181,7 @@
     <div class="login-card">
       <div class="login-logo">
         <div class="login-logo-icon">🏸</div>
-        <h1>Badminton Admin</h1>
+        <h1>Admin Panel</h1>
         <p>Court Management System</p>
       </div>
       <form class="login-form" id="form-login" novalidate>
@@ -295,7 +295,7 @@
         </div>
       </div>
 
-      <!-- QR PANEL (DENGAN KARTU TEMPLAT & CETAK PDF) -->
+      <!-- QR PANEL (DENGAN KARTU TEMPLAT & FOOTER BARU) -->
       <div class="admin-panel" id="panel-qr">
         <div class="admin-page-header">
           <div><h1 class="page-title">Direktori QR Code Lapangan</h1><p class="page-subtitle">Kelola dan cetak kartu QR Code lapangan terdaftar</p></div>
@@ -315,10 +315,10 @@
             </div>
           </div>
 
-          <!-- Pratinjau Kartu QR Sesuai Templat (Logo di atas & Footer Copyright) -->
+          <!-- Pratinjau Kartu QR Sesuai Templat dengan Footer Inline Baru -->
           <div id="print-section" style="display:none; background: #fff; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 420px; text-align: center; margin: 30px auto 0; border: 1px solid #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
             
-            <!-- Logo Header (Menggunakan logo ikon Anda yang disematkan langsung) -->
+            <!-- Logo Header -->
             <div style="width: 76px; height: 76px; background: #E8F5E9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 2px solid #A5D6A7; overflow:hidden;">
               <img src="icon_512.jpg" alt="Logo" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null; this.parentNode.innerHTML='🏸';" />
             </div>
@@ -326,7 +326,7 @@
             <!-- Title: Nama Lapangan -->
             <h2 id="print-court-name" style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 24px; letter-spacing: 0.5px;">—</h2>
 
-            <!-- Box QR Code Standar qrcode.min.js -->
+            <!-- Box QR Code Standar -->
             <div style="background: #F4FBF7; padding: 24px; border-radius: 16px; border: 2px dashed #81C784; display: inline-block; margin-bottom: 24px;">
               <div id="qrcode-display" style="display: flex; justify-content: center;"></div>
             </div>
@@ -336,15 +336,14 @@
               Scan QR Code diatas untuk melakukan Check-In / Mulai Sesi
             </p>
 
-            <!-- Garis Pemisah Tipis -->
-            <div style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 20px;"></div>
+            <!-- Footer Inline Baru sesuai Permintaan -->
+            <div class="card-footer-inline" style="margin-top: 10px;">
+              <div class="footer-divider" style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 16px;"></div>
+              <p class="footer-brand" style="color: #1e293b; font-size: 13px; font-weight: 700; margin-bottom: 6px;">🏸 BadmintonKuy - By Muz</p>
+              <p class="footer-text" style="color: #94a3b8; font-size: 12px; font-weight: 500; letter-spacing: 0.3px;">&copy; 2026 Muhammad Muzany Mulyoutomo. All rights reserved.</p>
+            </div>
 
-            <!-- Footer: Copyright -->
-            <p style="color: #94a3b8; font-size: 12px; font-weight: 500; letter-spacing: 0.3px;">
-              BadmintonKuy copyright Muhammad Muzany Mulyoutomo
-            </p>
-
-            <!-- Tombol Kontrol (Akan otomatis tersembunyi saat dicetak ke PDF) -->
+            <!-- Tombol Kontrol (Otomatis tersembunyi saat dicetak PDF) -->
             <div class="qr-controls" style="display: flex; gap: 10px; margin-top: 30px;">
               <button onclick="document.getElementById('print-section').style.display='none'" class="btn" style="flex:1; padding: 12px; background: #f1f5f9; color: #475569; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Tutup</button>
               <button onclick="window.print()" class="btn" style="flex:1; padding: 12px; background: #991B1B; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🖨️ Cetak / Simpan PDF</button>
