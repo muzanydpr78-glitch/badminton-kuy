@@ -736,34 +736,25 @@
       section.style.display = 'block';
       
       const container = document.getElementById('qrcode-display');
-      container.innerHTML = '';
       document.getElementById('print-court-name').textContent = courtName;
       
-      // Render QR Code dengan opsi render 'image' agar bisa dibaca html2canvas
-      new QRCode(container, { 
-        text: courtName, 
-        width: 200, 
-        height: 200,
-        colorDark : "#1e293b",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H,
-        useSVG: true
-      });
+      // Menggunakan QR Server API langsung berupa tag <img> murni, dijamin tidak akan kosong
+      const encodedText = encodeURIComponent(courtName);
+      container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedText}" alt="QR Code ${courtName}" crossorigin="anonymous" style="display:block; width:200px; height:200px;" />`;
 
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
-    // Download Kartu QR sebagai JPG menggunakan html2canvas dengan jeda render
+
+    // Download Kartu QR sebagai JPG menggunakan html2canvas
     document.getElementById('btn-download-jpg').addEventListener('click', function() {
       const printSection = document.getElementById('print-section');
       const controls = printSection.querySelector('.qr-controls');
       
-      // Sembunyikan tombol kontrol sementara saat merender gambar
       controls.style.display = 'none';
 
-      // Berikan jeda waktu 300ms agar canvas QR benar-benar matang sebelum dicapture
       setTimeout(() => {
-        html2canvas(printSection, { scale: 2, useCORS: true, logging: false }).then(canvas => {
-          controls.style.display = 'flex'; // Munculkan kembali tombol
+        html2canvas(printSection, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
+          controls.style.display = 'flex';
 
           const link = document.createElement('a');
           link.download = `Kartu-QR-${document.getElementById('print-court-name').textContent}.jpg`;
@@ -773,9 +764,8 @@
           controls.style.display = 'flex';
           alert('Gagal mendownload gambar kartu QR.');
         });
-      }, 300);
+      }, 200);
     });
-
     // Submit QR Baru
     document.getElementById('form-add-qr').addEventListener('submit', async function(e) {
       e.preventDefault();
