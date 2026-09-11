@@ -515,6 +515,10 @@
           errorEl.classList.add('visible');
           document.getElementById('admin-password').value = '';
         }
+      } catch (err) {
+      errorEl.classList.add('visible');
+      document.getElementById('admin-password').value = '';
+    }
     
       btn.disabled = false;
       btn.innerHTML = 'Masuk ke Panel';
