@@ -738,9 +738,11 @@
       const container = document.getElementById('qrcode-display');
       document.getElementById('print-court-name').textContent = courtName;
       
-      // Menggunakan QR Server API langsung berupa tag <img> murni, dijamin tidak akan kosong
-      const encodedText = encodeURIComponent(courtName);
-      container.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedText}" alt="QR Code ${courtName}" crossorigin="anonymous" style="display:block; width:200px; height:200px;" />`;
+      // Menggunakan Google Charts API yang diizinkan untuk proses canvas/html2canvas
+      const qrText = encodeURIComponent(courtName);
+      const qrUrl = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${qrText}&choe=UTF-8`;
+      
+      container.innerHTML = `<img src="${qrUrl}" alt="QR Code ${courtName}" crossorigin="anonymous" style="display:block; width:200px; height:200px;" />`;
 
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     };
@@ -752,8 +754,14 @@
       
       controls.style.display = 'none';
 
+      // Berikan waktu jeda 600ms agar gambar dari server benar-benar siap ter-load ke memori browser
       setTimeout(() => {
-        html2canvas(printSection, { scale: 2, useCORS: true, allowTaint: true }).then(canvas => {
+        html2canvas(printSection, { 
+          scale: 2, 
+          useCORS: true, 
+          allowTaint: false,
+          logging: false 
+        }).then(canvas => {
           controls.style.display = 'flex';
 
           const link = document.createElement('a');
@@ -764,8 +772,9 @@
           controls.style.display = 'flex';
           alert('Gagal mendownload gambar kartu QR.');
         });
-      }, 200);
+      }, 600);
     });
+    
     // Submit QR Baru
     document.getElementById('form-add-qr').addEventListener('submit', async function(e) {
       e.preventDefault();
