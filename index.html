@@ -1158,39 +1158,65 @@
       }
     }
 
-    function onQRSuccess(decodedText) {
-      // Stop scanner immediately
-      stopScanner();
+    async function onQRSuccess(decodedText) {
+    // Stop scanner immediately
+    stopScanner();
 
-      // Flash feedback
-      const flash = document.getElementById('scan-flash');
-      flash.classList.add('flash');
-      setTimeout(() => flash.classList.remove('flash'), 200);
+    // Flash feedback
+    const flash = document.getElementById('scan-flash');
+    flash.classList.add('flash');
+    setTimeout(() => flash.classList.remove('flash'), 200);
 
-      // Vibrate if supported
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    // Vibrate if supported
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
-      // Parse court ID — accept format: COURT-01, LAPANGAN-A, A, etc.
-      // Normalize: extract court identifier
-      const raw = decodedText.trim().toUpperCase();
-      let courtId = raw;
+    // Parse court ID
+    const raw = decodedText.trim().toUpperCase();
+    let courtId = raw;
 
-      // If it looks like a URL or JSON, try to extract court ID
-      if (raw.includes('COURT-')) {
-        const match = raw.match(/COURT-(\w+)/);
-        courtId = match ? `COURT-${match[1]}` : raw;
-      } else if (raw.includes('LAPANGAN')) {
-        courtId = raw;
+    if (raw.includes('COURT-')) {
+      const match = raw.match(/COURT-(\w+)/);
+      courtId = match ? `COURT-${match[1]}` : raw;
+    } else if (raw.includes('LAPANGAN')) {
+      courtId = raw;
+    }
+
+    // Tampilkan toast loading validasi sebentar
+    showToast("Memeriksa barcode ke database...", "info", 2000);
+
+    try {
+      // Ambil data terbaru secara real-time dari database Data_QR via backend
+      const res = await fetch(`${GAS_URL}?action=get_qrs`, { redirect: 'follow' });
+      const json = await res.json();
+      const qrs = json.data || [];
+
+      // Lakukan pencocokan apakah courtId hasil scan ada di dalam database
+      const isValid = qrs.some(q => String(q.courtName).trim().toUpperCase() === courtId);
+
+      if (!isValid) {
+        // Jika tidak terdaftar, munculkan pesan error sesuai permintaan dan reset scan
+        showToast("Barcode yang anda scan tidak terdaftar, silahkan scan barcode yang sudah terdaftar", "error", 5000);
+        setTimeout(() => {
+          startScanner(); // Buka kembali kamera untuk scan ulang
+        }, 1500);
+        return;
       }
 
+      // Jika valid, lanjutkan proses normal
       currentCourt = courtId;
 
-      // Transition to check-in form with delay for feedback
       setTimeout(() => {
         showCheckinForm(courtId);
       }, 500);
-    }
 
+    } catch (err) {
+      console.error("Gagal memvalidasi QR:", err);
+      showToast("Gagal memvalidasi QR, periksa koneksi internet.", "error");
+      setTimeout(() => {
+        startScanner();
+      }, 1500);
+    }
+  }
     /* ── Check-in Form ───────────────────────────────────────── */
     function showCheckinForm(courtId) {
       // Update badge
