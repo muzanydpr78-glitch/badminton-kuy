@@ -1158,7 +1158,40 @@
       }
     }
 
-    function onQRSuccess(decodedText) {
+    async function onQRSuccess(decodedText) {
+      // Parse court ID — accept format: COURT-01, LAPANGAN-A, A, etc.
+      const raw = decodedText.trim().toUpperCase();
+      let courtId = raw;
+
+      if (raw.includes('COURT-')) {
+        const match = raw.match(/COURT-(\w+)/);
+        courtId = match ? `COURT-${match[1]}` : raw;
+      } else if (raw.includes('LAPANGAN')) {
+        courtId = raw;
+      }
+
+      // 🔍 VALIDASI: Cek apakah QR terdaftar di database via GAS
+      try {
+        showToast('Memverifikasi QR Code...', 'info', 1500);
+        const res = await fetch(`${GAS_URL}?action=get_qrs`, { redirect: 'follow' });
+        const json = await res.json();
+        const qrs = json.data || [];
+
+        // Cek apakah courtId cocok dengan salah satu data QR yang terdaftar
+        const isValid = qrs.some(q => String(q.courtName).trim().toUpperCase() === courtId);
+
+        if (!isValid) {
+          // Kalau tidak terdaftar, hentikan proses, bunyikan error, dan biarkan scanner tetap nyala
+          showToast('Barcode yang anda scan tidak terdaftar, coba scan barcode yang sudah terdaftar', 'error', 4000);
+          return; 
+        }
+      } catch (err) {
+        console.error('Gagal memvalidasi QR:', err);
+        showToast('Gagal memvalidasi QR. Periksa koneksi internet.', 'error');
+        return;
+      }
+
+      // --- JIKA VALID, LANJUTKAN PROSES SEPERTI BIASA ---
       // Stop scanner immediately
       stopScanner();
 
@@ -1169,19 +1202,6 @@
 
       // Vibrate if supported
       if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
-      // Parse court ID — accept format: COURT-01, LAPANGAN-A, A, etc.
-      // Normalize: extract court identifier
-      const raw = decodedText.trim().toUpperCase();
-      let courtId = raw;
-
-      // If it looks like a URL or JSON, try to extract court ID
-      if (raw.includes('COURT-')) {
-        const match = raw.match(/COURT-(\w+)/);
-        courtId = match ? `COURT-${match[1]}` : raw;
-      } else if (raw.includes('LAPANGAN')) {
-        courtId = raw;
-      }
 
       currentCourt = courtId;
 
