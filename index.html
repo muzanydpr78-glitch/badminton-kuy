@@ -1280,17 +1280,27 @@
             nama_pic: name,
             id_lapangan: currentCourt,
           });
-          await fetch(GAS_URL, {
+          const response = await fetch(GAS_URL, {
             method: 'POST',
             redirect: 'follow',
             body: formData,
           });
+          
+          // Tangkap dan baca balasan JSON dari Apps Script
+          const result = await response.json();
+
+          if (result.status !== 'success') {
+            // Kalau ditolak server (misal lapangan masih Active), hentikan proses!
+            showToast(result.message || 'Gagal memulai sesi.', 'error', 5000);
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Mulai Sesi';
+            return; // Keluar agar tidak lanjut simpan atau pindah layar
+          }
         } else {
-          // Simulate network delay
           await new Promise(r => setTimeout(r, 800));
         }
 
-        // Save to LocalStorage
+        // Hanya dijalankan JIKA server benar-benar membalas 'success'
         const sessionData = {
           txnId,
           courtId: currentCourt,
