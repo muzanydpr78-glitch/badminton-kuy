@@ -301,8 +301,20 @@
             </div>
             <div style="overflow-x:auto;">
               <table class="data-table">
-                <thead><tr><th>#</th><th>ID Transaksi</th><th>Court</th><th>PIC</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
-                <tbody id="log-table-body"><tr><td colspan="7" style="text-align:center;padding:24px;">Memuat data...</td></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>ID Transaksi</th>
+                    <th>Court</th>
+                    <th>PIC</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Total Anggota</th>
+                    <th>Total Shuttlecock</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="log-table-body"><tr><td colspan="9" style="text-align:center;padding:24px;">Memuat data...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -394,12 +406,11 @@
       <div style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 16px;"></div>
 
       <!-- Footer: Copyright -->
-      <!-- Footer Inline Baru sesuai Permintaan -->
-            <div class="card-footer-inline" style="margin-top: 10px;">
-              <div class="footer-divider" style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 16px;"></div>
-              <p class="footer-brand" style="color: #1e293b; font-size: 13px; font-weight: 700; margin-bottom: 6px;">🏸 BadmintonKuy - By Muz</p>
-              <p class="footer-text" style="color: #94a3b8; font-size: 12px; font-weight: 500; letter-spacing: 0.3px;">&copy; 2026 Muhammad Muzany Mulyoutomo. All rights reserved.</p>
-            </div>
+      <div class="card-footer-inline" style="margin-top: 10px;">
+        <div class="footer-divider" style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 16px;"></div>
+        <p class="footer-brand" style="color: #1e293b; font-size: 13px; font-weight: 700; margin-bottom: 6px;">🏸 BadmintonKuy - By Muz</p>
+        <p class="footer-text" style="color: #94a3b8; font-size: 12px; font-weight: 500; letter-spacing: 0.3px;">&copy; 2026 Muhammad Muzany Mulyoutomo. All rights reserved.</p>
+      </div>
     </div>
   </div>
 
@@ -636,7 +647,7 @@
     function renderLogTable(data) {
       const tbody = document.getElementById('log-table-body');
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;">Tidak ada data log transaksi</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;">Tidak ada data log transaksi</td></tr>`;
         return;
       }
       tbody.innerHTML = data.map((d, i) => `
@@ -647,6 +658,8 @@
           <td>${d.picName}</td>
           <td>${new Date(d.checkIn).toLocaleString('id-ID')}</td>
           <td>${d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '—'}</td>
+          <td>${d.members != null ? d.members + ' orang' : '—'}</td>
+          <td>${d.shuttle != null ? d.shuttle + ' pcs' : '—'}</td>
           <td><span class="status-badge ${d.status === 'Active' ? 'status-active' : 'status-completed'}">${d.status}</span></td>
         </tr>
       `).join('');
@@ -677,53 +690,6 @@
       renderLogTable(allData);
     });
     document.getElementById('btn-refresh-log').addEventListener('click', fetchAndRenderLog);
-
-    // Export to Excel Handler
-    document.getElementById('btn-confirm-export').addEventListener('click', () => {
-      const startVal = document.getElementById('export-start-date').value;
-      const endVal = document.getElementById('export-end-date').value;
-
-      let exportData = [...allData];
-
-      if (startVal) {
-        const startTs = new Date(startVal).setHours(0,0,0,0);
-        exportData = exportData.filter(d => d.checkIn >= startTs);
-      }
-      if (endVal) {
-        const endTs = new Date(endVal).setHours(23,59,59,999);
-        exportData = exportData.filter(d => d.checkIn <= endTs);
-      }
-
-      if (exportData.length === 0) {
-        alert('Tidak ada data pada rentang tanggal tersebut.');
-        return;
-      }
-
-      const rows = exportData.map((d, index) => ({
-        No: index + 1,
-        'ID Transaksi': d.txnId,
-        'Lapangan': d.courtId,
-        'Nama PIC': d.picName,
-        'Check-in': new Date(d.checkIn).toLocaleString('id-ID'),
-        'Check-out': d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : 'Belum Check-out',
-        'Jumlah Anggota': d.members || 0,
-        'Shuttlecock Terpakai': d.shuttle || 0,
-        'Status': d.status
-      }));
-
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Log Aktivitas");
-
-      const now = new Date();
-      const dd = String(now.getDate()).padStart(2, '0');
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const yyyy = now.getFullYear();
-      const fileName = `Data_Aktivitas_BadmintonKuy-${dd}${mm}${yyyy}.xlsx`;
-
-      XLSX.writeFile(workbook, fileName);
-      document.getElementById('modal-export').classList.remove('active');
-    });
 
     // Fetch & Render QR List
     async function fetchAndRenderQRList() {
