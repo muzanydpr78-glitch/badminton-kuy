@@ -1445,6 +1445,7 @@
 
       const checkOutTime = Date.now();
       const cashIncome = Number(document.getElementById('cash-income').value || 0);
+
       try {
         if (GAS_URL) {
           const formData = new URLSearchParams({
@@ -1455,11 +1456,22 @@
             shuttlecock_terpakai: shuttleCount,
             pemasukan_kas: cashIncome,
           });
-          await fetch(GAS_URL, {
+          
+          const response = await fetch(GAS_URL, {
             method: 'POST',
             redirect: 'follow',
             body: formData,
           });
+          
+          // Tangkap balasan JSON dari Apps Script dengan aman
+          const result = await response.json();
+
+          if (result.status !== 'success') {
+            showToast(result.message || 'Gagal menyelesaikan sesi.', 'error', 5000);
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Selesaikan Sesi';
+            return;
+          }
         } else {
           await new Promise(r => setTimeout(r, 800));
         }
@@ -1579,7 +1591,7 @@
       checkExistingSession();
     });
 
-    /* ── Init ────────────────────────────────────────────────── */
+    /* ── Init ────────────────────────────────------------------ */
     function init() {
       // Check LocalStorage for active session
       const session = loadSession();
