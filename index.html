@@ -888,6 +888,15 @@
           </div>
         </div>
 
+        <!-- Pemasukan Kas -->
+        <div class="form-group">
+          <label class="form-label" for="cash-income">Pemasukan Kas (Rp)</label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;" aria-hidden="true">💰</span>
+            <input id="cash-income" type="number" class="form-input" placeholder="Contoh: 50000" min="0" step="1000" style="padding-left:42px;" />
+          </div>
+        </div>
+
         <!-- Summary -->
         <div class="summary-card">
           <div class="summary-title">📋 Ringkasan Sesi</div>
@@ -1435,7 +1444,7 @@
       btn.innerHTML = '<span class="btn-spinner"></span> Menyelesaikan...';
 
       const checkOutTime = Date.now();
-
+      const cashIncome = Number(document.getElementById('cash-income').value || 0);
       try {
         if (GAS_URL) {
           const formData = new URLSearchParams({
@@ -1444,6 +1453,7 @@
             waktu_checkout: new Date(checkOutTime).toISOString(),
             jumlah_anggota: membersCount,
             shuttlecock_terpakai: shuttleCount,
+            pemasukan_kas: cashIncome,
           });
           await fetch(GAS_URL, {
             method: 'POST',
