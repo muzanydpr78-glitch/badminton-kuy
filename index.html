@@ -960,6 +960,10 @@
             <span class="summary-row-label">🏸 Shuttlecock</span>
             <span class="summary-row-value" id="complete-shuttle">—</span>
           </div>
+          <div class="summary-row">
+            <span class="summary-row-label">💰 Pemasukan Kas</span>
+            <span class="summary-row-value" id="complete-cash">—</span>
+          </div>
         </div>
       </div>
 
@@ -1478,7 +1482,7 @@
 
         // Show complete screen
         const elapsed = checkOutTime - session.checkInTime;
-        showCompleteScreen(session, elapsed, membersCount, shuttleCount);
+        showCompleteScreen(session, elapsed, membersCount, shuttleCount, cashIncome);
 
         // Cleanup
         stopTimer();
@@ -1499,11 +1503,12 @@
     });
 
     /* ── Session Complete ────────────────────────────────────── */
-    function showCompleteScreen(session, elapsedMs, members, shuttle) {
+    function showCompleteScreen(session, elapsedMs, members, shuttle, cashIncome) {
       document.getElementById('complete-court').textContent = session.courtId;
       document.getElementById('complete-duration').textContent = formatDurationHuman(elapsedMs);
       document.getElementById('complete-members').textContent = `${members} orang`;
       document.getElementById('complete-shuttle').textContent = `${shuttle} buah`;
+      document.getElementById('complete-cash').textContent = 'Rp ' + Number(cashIncome).toLocaleString('id-ID'); // Menampilkan format rupiah
       showScreen('complete', 'fade');
     }
 
