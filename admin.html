@@ -348,4 +348,528 @@
         </div>
         <div class="content-area">
           <div class="table-container">
-            <div class="section-header
+            <div class="section-header">
+              <h2 class="section-title">Daftar QR Terdaftar</h2>
+              <button class="btn-refresh" id="btn-refresh-qr">Refresh</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead><tr><th>ID QR</th><th>Nama / Nomor Lapangan</th><th>Tanggal Dibuat</th><th>Aksi Cetak</th></tr></thead>
+                <tbody id="qr-list-body"><tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--gray-500);">Memuat data QR...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAJEMEN ADMIN PANEL -->
+      <div class="admin-panel" id="panel-admin-mgmt">
+        <div class="admin-page-header">
+          <div><h1 class="page-title">Manajemen Admin</h1><p class="page-subtitle">Kelola akun admin dan hak akses sistem</p></div>
+          <button class="btn btn-secondary" id="btn-open-modal-admin" style="background:#991B1B;color:#fff;border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;">+ Tambah Akun Admin Baru</button>
+        </div>
+        <div class="content-area">
+          <div class="table-container">
+            <div class="section-header">
+              <h2 class="section-title">Daftar Akun Terdaftar</h2>
+              <button class="btn-refresh" id="btn-refresh-admins">Refresh</button>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead><tr><th>ID Admin</th><th>Nama</th><th>Role</th><th>Telegram Chat ID</th><th>Aksi</th></tr></thead>
+                <tbody id="admin-list-body"><tr><td colspan="5" style="text-align:center;padding:24px;">Memuat data admin...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PANEL -->
+      <div class="admin-panel" id="panel-settings">
+        <div class="admin-page-header"><h1 class="page-title">Pengaturan Akun</h1><p class="page-subtitle">Ubah nama admin dan password panel</p></div>
+        <div class="content-area">
+          <div class="card" style="max-width: 500px; padding: 24px; background:#fff; border-radius:8px; box-shadow:var(--shadow-1);">
+            <form id="form-settings" style="display: flex; flex-direction: column; gap: 16px;" novalidate>
+              <div><label style="font-size:13px;font-weight:600;">Nama Admin</label><input type="text" id="setting-name" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" required /></div>
+              <div><label style="font-size:13px;font-weight:600;">Password Baru</label><input type="password" id="setting-password" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" placeholder="Kosongkan jika tetap" /></div>
+              <button type="submit" style="padding:10px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Simpan Pengaturan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER TERSEMBUNYI UNTUK PROSES CETAK PDF OTOMATIS -->
+  <div id="print-container-hidden">
+    <div id="print-card-template">
+      <!-- Logo Header -->
+      <div style="width: 76px; height: 76px; background: #E8F5E9; border-radius: 20%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 2px solid #A5D6A7; overflow:hidden;">
+        <img src="icon_512.png" alt="Logo" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null; this.parentNode.innerHTML='🏸';" />
+      </div>
+
+      <!-- Title: Nama Lapangan -->
+      <h2 id="print-court-name" style="font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 24px; letter-spacing: 0.5px;">—</h2>
+
+      <!-- Box QR Code -->
+      <div style="background: #F4FBF7; padding: 24px; border-radius: 16px; border: 2px dashed #81C784; display: inline-block; margin-bottom: 24px;">
+        <div id="qrcode-display" style="display: flex; justify-content: center;"></div>
+      </div>
+
+      <!-- Instruksi -->
+      <p style="color: #475569; font-size: 15px; font-weight: 600; line-height: 1.5; margin-bottom: 24px; padding: 0 16px;">
+        Scan QR Code diatas untuk melakukan Check-In / Mulai Sesi
+      </p>
+
+      <!-- Garis Pemisah Tipis -->
+      <div style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 16px;"></div>
+
+      <!-- Footer: Copyright -->
+      <div class="card-footer-inline" style="margin-top: 10px;">
+        <div class="footer-divider" style="height: 1px; background: #C8E6C9; width: 80%; margin: 0 auto 16px;"></div>
+        <p class="footer-brand" style="color: #1e293b; font-size: 13px; font-weight: 700; margin-bottom: 6px;">🏸 BadmintonKuy - By Muz</p>
+        <p class="footer-text" style="color: #94a3b8; font-size: 12px; font-weight: 500; letter-spacing: 0.3px;">&copy; 2026 Muhammad Muzany Mulyoutomo. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXPORT EXCEL -->
+  <div class="modal-backdrop" id="modal-export">
+    <div class="modal-box">
+      <div class="modal-header"><h3 style="font-size:18px;font-weight:bold;">Export Data ke Excel</h3><button class="modal-close" id="btn-close-modal-export">✕</button></div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div><label style="font-size:13px;font-weight:600;">Dari Tanggal</label><input type="date" id="export-start-date" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" /></div>
+        <div><label style="font-size:13px;font-weight:600;">Sampai Tanggal</label><input type="date" id="export-end-date" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" /></div>
+        <p style="font-size: 11px; color: var(--gray-500);">*Kosongkan untuk mengexport seluruh data riwayat aktivitas.</p>
+        <button id="btn-confirm-export" style="padding:10px;background:#059669;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Download File Excel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH QR BARU -->
+  <div class="modal-backdrop" id="modal-qr">
+    <div class="modal-box">
+      <div class="modal-header"><h3 style="font-size:18px;font-weight:bold;">Daftarkan Lapangan / QR Baru</h3><button class="modal-close" id="btn-close-modal-qr">✕</button></div>
+      <form id="form-add-qr" style="display:flex; flex-direction:column; gap:14px;">
+        <div><label style="font-size:13px;font-weight:600;">Nama / ID Lapangan</label><input type="text" id="new-court-name" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" placeholder="Contoh: COURT-A" required /></div>
+        <button type="submit" id="btn-submit-qr" style="padding:10px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Simpan & Buat QR</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH ADMIN BARU -->
+  <div class="modal-backdrop" id="modal-admin">
+    <div class="modal-box">
+      <div class="modal-header"><h3 style="font-size:18px;font-weight:bold;">Tambah Akun Admin Baru</h3><button class="modal-close" id="btn-close-modal-admin">✕</button></div>
+      <form id="form-add-admin" style="display:flex; flex-direction:column; gap:14px;">
+        <div><label style="font-size:13px;font-weight:600;">Nama Lengkap</label><input type="text" id="new-admin-name" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" required /></div>
+        <div><label style="font-size:13px;font-weight:600;">Password</label><input type="password" id="new-admin-pwd" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" required /></div>
+        <div><label style="font-size:13px;font-weight:600;">Telegram Chat ID</label><input type="text" id="new-admin-chatid" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;" placeholder="Contoh: 6808739491" /></div>
+        <div>
+          <label style="font-size:13px;font-weight:600;">Role / Hak Akses</label>
+          <select id="new-admin-role" class="form-input" style="color:#000;border:1px solid #ccc;margin-top:4px;height:42px;">
+            <option value="Admin Biasa">Admin Biasa</option>
+            <option value="Administrator">Administrator</option>
+          </select>
+        </div>
+        <button type="submit" id="btn-submit-admin" style="padding:10px;background:#991B1B;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Simpan Admin</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    'use strict';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI_nrI6IsdoB61ilcg8ho9IO5ehtBcbX33IiJYa4Wufw7TrWqUmm5VKu7VnwZNmIgx/exec'; // Masukkan URL Web App GAS Anda
+    const LS_ADMIN_KEY = 'badminton_admin_auth';
+    let allData = [];
+    let currentAdminRole = sessionStorage.getItem('admin_role') || 'Admin Biasa';
+    let currentAdminName = sessionStorage.getItem('admin_name') || 'Admin';
+    let playersChartInstance = null;
+    let shuttleChartInstance = null;
+
+    if (sessionStorage.getItem(LS_ADMIN_KEY) === 'true') {
+      document.getElementById('screen-login').classList.remove('active');
+      document.getElementById('admin-layout').classList.add('active');
+      applyRolePermissions();
+      initDashboard();
+    }
+
+    function applyRolePermissions() {
+      const adminMgmtNav = document.getElementById('nav-admin-mgmt');
+      const drawerAdminMgmt = document.getElementById('drawer-nav-admin-mgmt');
+      if (currentAdminRole === 'Administrator') {
+        if (adminMgmtNav) adminMgmtNav.style.display = 'flex';
+        if (drawerAdminMgmt) drawerAdminMgmt.style.display = 'flex';
+      } else {
+        if (adminMgmtNav) adminMgmtNav.style.display = 'none';
+        if (drawerAdminMgmt) drawerAdminMgmt.style.display = 'none';
+      }
+      document.getElementById('admin-greeting-text').textContent = `Halo, ${currentAdminName} (${currentAdminRole})`;
+      document.getElementById('setting-name').value = currentAdminName;
+    }
+
+    // Login Form Handler
+    document.getElementById('form-login').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const password = document.getElementById('admin-password').value;
+      const errorEl = document.getElementById('login-error');
+      errorEl.classList.remove('visible');
+
+      try {
+        const res = await fetch(`${GAS_URL}?action=get_admins`, { redirect: 'follow' });
+        const json = await res.json();
+        const admins = json.data || [];
+        let matchedAdmin = admins.find(a => String(a.password) === String(password));
+
+        if (matchedAdmin) {
+          sessionStorage.setItem(LS_ADMIN_KEY, 'true');
+          sessionStorage.setItem('admin_role', matchedAdmin.role);
+          sessionStorage.setItem('admin_name', matchedAdmin.namaAdmin);
+          currentAdminRole = matchedAdmin.role;
+          currentAdminName = matchedAdmin.namaAdmin;
+
+          document.getElementById('screen-login').classList.remove('active');
+          document.getElementById('admin-layout').classList.add('active');
+          applyRolePermissions();
+          initDashboard();
+        } else {
+          errorEl.classList.add('visible');
+          document.getElementById('admin-password').value = '';
+        }
+      } catch (err) {
+        errorEl.classList.add('visible');
+      }
+    });
+
+    function doLogout() {
+      sessionStorage.clear();
+      location.reload();
+    }
+    document.getElementById('btn-logout').addEventListener('click', doLogout);
+    document.getElementById('btn-drawer-logout').addEventListener('click', doLogout);
+
+    // Navigation Switches
+    function switchPanel(name) {
+      if (name === 'admin-mgmt' && currentAdminRole !== 'Administrator') return;
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('[data-drawer-nav]').forEach(l => l.classList.remove('active'));
+
+      const panel = document.getElementById(`panel-${name}`);
+      const navBtn = document.getElementById(`nav-${name}`);
+      const drawerBtn = document.querySelector(`[data-drawer-nav="${name}"]`);
+      
+      if (panel) panel.classList.add('active');
+      if (navBtn) navBtn.classList.add('active');
+      if (drawerBtn) drawerBtn.classList.add('active');
+
+      if (name === 'log') fetchAndRenderLog();
+      if (name === 'qr') fetchAndRenderQRList();
+      if (name === 'admin-mgmt') fetchAndRenderAdmins();
+    }
+
+    document.getElementById('nav-dashboard').addEventListener('click', () => switchPanel('dashboard'));
+    document.getElementById('nav-log').addEventListener('click', () => switchPanel('log'));
+    document.getElementById('nav-qr').addEventListener('click', () => switchPanel('qr'));
+    document.getElementById('nav-admin-mgmt').addEventListener('click', () => switchPanel('admin-mgmt'));
+    document.getElementById('nav-settings').addEventListener('click', () => switchPanel('settings'));
+
+    // Drawer navigation handlers
+    document.querySelectorAll('[data-drawer-nav]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchPanel(btn.dataset.drawerNav);
+        document.getElementById('drawer-overlay').classList.remove('active');
+        document.getElementById('mobile-drawer').classList.remove('active');
+      });
+    });
+
+    document.getElementById('btn-hamburger').addEventListener('click', () => {
+      document.getElementById('drawer-overlay').classList.add('active');
+      document.getElementById('mobile-drawer').classList.add('active');
+    });
+    document.getElementById('btn-drawer-close').addEventListener('click', () => {
+      document.getElementById('drawer-overlay').classList.remove('active');
+      document.getElementById('mobile-drawer').classList.remove('active');
+    });
+    document.getElementById('drawer-overlay').addEventListener('click', () => {
+      document.getElementById('drawer-overlay').classList.remove('active');
+      document.getElementById('mobile-drawer').classList.remove('active');
+    });
+
+    // Modal Triggers (QR)
+    document.getElementById('btn-open-modal-qr').addEventListener('click', () => document.getElementById('modal-qr').classList.add('active'));
+    document.getElementById('btn-close-modal-qr').addEventListener('click', () => document.getElementById('modal-qr').classList.remove('active'));
+
+    // Modal Triggers (Admin)
+    document.getElementById('btn-open-modal-admin').addEventListener('click', () => document.getElementById('modal-admin').classList.add('active'));
+    document.getElementById('btn-close-modal-admin').addEventListener('click', () => document.getElementById('modal-admin').classList.remove('active'));
+
+    // Modal Triggers (Export Excel)
+    document.getElementById('btn-open-modal-export').addEventListener('click', () => document.getElementById('modal-export').classList.add('active'));
+    document.getElementById('btn-close-modal-export').addEventListener('click', () => document.getElementById('modal-export').classList.remove('active'));
+
+    async function fetchData() {
+      try {
+        const res = await fetch(GAS_URL, { redirect: 'follow' });
+        const json = await res.json();
+        return json.data || [];
+      } catch (err) { return []; }
+    }
+
+    async function initDashboard() {
+      const now = new Date();
+      document.getElementById('current-date-display').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      allData = await fetchData();
+      updateSummaryCards();
+      updateLiveCourts();
+    }
+
+    function updateSummaryCards() {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const todayTs = today.getTime();
+      const todayData = allData.filter(d => d.checkIn >= todayTs);
+      
+      document.getElementById('metric-total-sessions').textContent = todayData.length;
+      document.getElementById('metric-active-sessions').textContent = todayData.filter(d => d.status === 'Active').length;
+      document.getElementById('metric-total-players').textContent = todayData.filter(d => d.members).reduce((s, d) => s + (d.members || 0), 0);
+      document.getElementById('metric-shuttlecock').textContent = todayData.filter(d => d.shuttle != null).reduce((s, d) => s + (d.shuttle || 0), 0);
+      
+      // Render Trendline Charts for Today's Data
+      renderDashboardCharts(todayData);
+    }
+
+    function renderDashboardCharts(todayData) {
+      const sortedData = [...todayData].sort((a, b) => a.checkIn - b.checkIn);
+      const labels = sortedData.map((d, index) => `Sesi ${index + 1} (${d.courtId})`);
+      const playersData = sortedData.map(d => d.members || 0);
+      const shuttleData = sortedData.map(d => d.shuttle || 0);
+
+      // Chart Total Orang
+      const ctxPlayers = document.getElementById('chartPlayers').getContext('2d');
+      if (playersChartInstance) playersChartInstance.destroy();
+      playersChartInstance = new Chart(ctxPlayers, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total Orang',
+            data: playersData,
+            borderColor: '#059669',
+            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+
+      // Chart Shuttlecock
+      const ctxShuttle = document.getElementById('chartShuttle').getContext('2d');
+      if (shuttleChartInstance) shuttleChartInstance.destroy();
+      shuttleChartInstance = new Chart(ctxShuttle, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Shuttlecock Terpakai',
+            data: shuttleData,
+            borderColor: '#2563EB',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    function updateLiveCourts() {
+      const activeSessions = allData.filter(d => d.status === 'Active');
+      const tbody = document.getElementById('live-courts-body');
+      if (activeSessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray-500);">Tidak ada lapangan aktif saat ini</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = activeSessions.map(s => `
+        <tr>
+          <td><strong>${s.courtId}</strong></td>
+          <td>${s.picName}</td>
+          <td>${new Date(s.checkIn).toLocaleTimeString('id-ID')} WIB</td>
+          <td>Live</td>
+          <td><span class="txn-id">${s.txnId}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('btn-refresh-dashboard').addEventListener('click', async () => {
+      allData = await fetchData();
+      updateSummaryCards();
+      updateLiveCourts();
+    });
+
+    // Log Data & Filter Tanggal
+    async function fetchAndRenderLog() {
+      allData = await fetchData();
+      applyLogFilter();
+    }
+
+    function renderLogTable(data) {
+      const tbody = document.getElementById('log-table-body');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;">Tidak ada data log transaksi</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = data.map((d, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><span class="txn-id">${d.txnId}</span></td>
+          <td><strong>${d.courtId}</strong></td>
+          <td>${d.picName}</td>
+          <td>${new Date(d.checkIn).toLocaleString('id-ID')}</td>
+          <td>${d.checkOut ? new Date(d.checkOut).toLocaleString('id-ID') : '—'}</td>
+          <td>${d.members != null ? d.members + ' orang' : '—'}</td>
+          <td>${d.shuttle != null ? d.shuttle + ' pcs' : '—'}</td>
+          <td><span class="status-badge ${d.status === 'Active' ? 'status-active' : 'status-completed'}">${d.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function applyLogFilter() {
+      const startDateVal = document.getElementById('filter-start-date').value;
+      const endDateVal = document.getElementById('filter-end-date').value;
+
+      let filtered = [...allData];
+
+      if (startDateVal) {
+        const startTs = new Date(startDateVal).setHours(0,0,0,0);
+        filtered = filtered.filter(d => d.checkIn >= startTs);
+      }
+      if (endDateVal) {
+        const endTs = new Date(endDateVal).setHours(23,59,59,999);
+        filtered = filtered.filter(d => d.checkIn <= endTs);
+      }
+
+      renderLogTable(filtered);
+    }
+
+    document.getElementById('btn-apply-filter').addEventListener('click', applyLogFilter);
+    document.getElementById('btn-reset-filter').addEventListener('click', () => {
+      document.getElementById('filter-start-date').value = '';
+      document.getElementById('filter-end-date').value = '';
+      renderLogTable(allData);
+    });
+    document.getElementById('btn-refresh-log').addEventListener('click', fetchAndRenderLog);
+
+    // Fetch & Render QR List
+    async function fetchAndRenderQRList() {
+      const tbody = document.getElementById('qr-list-body');
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px;">Memuat data...</td></tr>`;
+      try {
+        const res = await fetch(`${GAS_URL}?action=get_qrs`, { redirect: 'follow' });
+        const json = await res.json();
+        const qrs = json.data || [];
+        if (qrs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--gray-500);">Belum ada QR terdaftar</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = qrs.map(q => `
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">${q.idQr}</td>
+            <td><strong>${q.courtName}</strong></td>
+            <td>${new Date(Number(q.createdAt)).toLocaleDateString('id-ID')}</td>
+            <td><button class="action-btn" onclick="directPrintQR('${q.courtName}')" title="Cetak Kartu QR ke PDF">🖨️</button></td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Gagal memuat data QR</td></tr>`;
+      }
+    }
+
+    document.getElementById('btn-refresh-qr').addEventListener('click', fetchAndRenderQRList);
+
+    // Fungsi Langsung Render & Cetak PDF tanpa Preview
+    window.directPrintQR = function(courtName) {
+      const container = document.getElementById('qrcode-display');
+      container.innerHTML = '';
+      document.getElementById('print-court-name').textContent = courtName;
+      
+      new QRCode(container, { 
+        text: courtName, 
+        width: 200, 
+        height: 200,
+        colorDark : "#1e293b",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    };
+
+    // Submit QR Baru
+    document.getElementById('form-add-qr').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-court-name').value.trim();
+      if (!name) return;
+      try {
+        const fd = new URLSearchParams({ action: 'add_qr', court_name: name });
+        await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+        document.getElementById('modal-qr').classList.remove('active');
+        document.getElementById('new-court-name').value = '';
+        fetchAndRenderQRList();
+      } catch (err) {
+        alert('Gagal menyimpan QR');
+      }
+    });
+
+    // Fetch & Render Admin List
+    async function fetchAndRenderAdmins() {
+      const tbody = document.getElementById('admin-list-body');
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding:24px;">Memuat admin...</td></tr>`;
+      try {
+        const res = await fetch(`${GAS_URL}?action=get_admins`, { redirect: 'follow' });
+        const json = await res.json();
+        const admins = json.data || [];
+        tbody.innerHTML = admins.map(a => `
+          <tr>
+            <td><span class="txn-id">${a.idAdmin}</span></td>
+            <td><strong>${a.namaAdmin}</strong></td>
+            <td>${a.role}</td>
+            <td>${a.telegramChatId || '—'}</td>
+            <td>${a.idAdmin !== 'ADM-001' ? `<button class="action-btn delete" onclick="deleteAdmin('${a.idAdmin}')">🗑️</button>` : 'Default'}</td>
+          </tr>
+        `).join('');
+      } catch (e) {}
+    }
+
+    document.getElementById('btn-refresh-admins').addEventListener('click', fetchAndRenderAdmins);
+
+    // Submit Admin Baru
+    document.getElementById('form-add-admin').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const nama = document.getElementById('new-admin-name').value;
+      const pwd = document.getElementById('new-admin-pwd').value;
+      const chatId = document.getElementById('new-admin-chatid').value;
+      const role = document.getElementById('new-admin-role').value;
+      try {
+        const fd = new URLSearchParams({ action: 'add_admin', nama_admin: nama, password: pwd, role: role, telegram_chat_id: chatId });
+        await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+        document.getElementById('modal-admin').classList.remove('active');
+        document.getElementById('form-add-admin').reset();
+        fetchAndRenderAdmins();
+      } catch (err) {}
+    });
+
+    window.deleteAdmin = async function(id) {
+      if (!confirm('Hapus akses admin ini?')) return;
+      const fd = new URLSearchParams({ action: 'delete_admin', id_admin: id });
+      await fetch(GAS_URL, { method: 'POST', redirect: 'follow', body: fd });
+      fetchAndRenderAdmins();
+    };
+  </script>
+</body>
+</html>
