@@ -262,6 +262,20 @@
             <div class="summary-card"><div class="card-value" id="metric-shuttlecock" style="color:#2563EB;">—</div><div class="card-label">Shuttlecock Terpakai</div></div>
           </div>
 
+          <!-- Filter Range Tanggal untuk Grafik -->
+          <div class="card" style="background:#fff; padding:16px; border-radius:8px; box-shadow:var(--shadow-1); display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+            <div style="flex:1; min-width:150px;">
+              <label style="font-size:12px; font-weight:600; color:var(--gray-600);">Dari Tanggal (Grafik)</label>
+              <input type="date" id="chart-start-date" class="form-input" style="color:#000; border:1px solid #ccc; margin-top:4px;" />
+            </div>
+            <div style="flex:1; min-width:150px;">
+              <label style="font-size:12px; font-weight:600; color:var(--gray-600);">Sampai Tanggal (Grafik)</label>
+              <input type="date" id="chart-end-date" class="form-input" style="color:#000; border:1px solid #ccc; margin-top:4px;" />
+            </div>
+            <button id="btn-apply-chart-filter" class="btn" style="height:42px; padding:0 16px; background:#991B1B; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Terapkan Filter</button>
+            <button id="btn-reset-chart-filter" class="btn" style="height:42px; padding:0 16px; background:#e5e7eb; color:#374151; border:none; border-radius:6px; cursor:pointer; font-weight:600;">Reset Hari Ini</button>
+          </div>
+
           <!-- Trendline Chart Section -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6);">
             <div class="summary-card" style="padding: var(--space-5);">
@@ -635,13 +649,45 @@
       document.getElementById('metric-total-players').textContent = todayData.filter(d => d.members).reduce((s, d) => s + (d.members || 0), 0);
       document.getElementById('metric-shuttlecock').textContent = todayData.filter(d => d.shuttle != null).reduce((s, d) => s + (d.shuttle || 0), 0);
       
-      // Render Trendline Charts for Today's Data
-      renderDashboardCharts(todayData);
+      applyChartFilter();
     }
 
-    function renderDashboardCharts(todayData) {
-      const sortedData = [...todayData].sort((a, b) => a.checkIn - b.checkIn);
-      const labels = sortedData.map((d, index) => `Sesi ${index + 1} (${d.courtId})`);
+    function applyChartFilter() {
+      const startDateVal = document.getElementById('chart-start-date').value;
+      const endDateVal = document.getElementById('chart-end-date').value;
+
+      let filtered = [...allData];
+
+      if (startDateVal) {
+        const startTs = new Date(startDateVal).setHours(0,0,0,0);
+        filtered = filtered.filter(d => d.checkIn >= startTs);
+      }
+      if (endDateVal) {
+        const endTs = new Date(endDateVal).setHours(23,59,59,999);
+        filtered = filtered.filter(d => d.checkIn <= endTs);
+      }
+
+      if (!startDateVal && !endDateVal) {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        filtered = filtered.filter(d => d.checkIn >= today.getTime());
+      }
+
+      renderDashboardCharts(filtered);
+    }
+
+    document.getElementById('btn-apply-chart-filter').addEventListener('click', applyChartFilter);
+    document.getElementById('btn-reset-chart-filter').addEventListener('click', () => {
+      document.getElementById('chart-start-date').value = '';
+      document.getElementById('chart-end-date').value = '';
+      applyChartFilter();
+    });
+
+    function renderDashboardCharts(chartData) {
+      const sortedData = [...chartData].sort((a, b) => a.checkIn - b.checkIn);
+      const labels = sortedData.map((d) => {
+        const dateStr = new Date(d.checkIn).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        return `${dateStr} (${d.courtId})`;
+      });
       const playersData = sortedData.map(d => d.members || 0);
       const shuttleData = sortedData.map(d => d.shuttle || 0);
 
